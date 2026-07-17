@@ -1,0 +1,49 @@
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["apps/api", "libs/backend", "tools/scraper"]
+
+[dependency-groups]
+dev = [
+    "httpx==0.28.1",
+    "import-linter==2.13",
+    "pre-commit==4.6.0",
+    "pyright==1.1.411",
+    "pytest==9.1.1",
+    "ruff==0.15.21",
+    "rust-just==1.56.0",
+    "tach==0.35.0",
+]
+
+[tool.pytest.ini_options]
+addopts = "-ra --import-mode=importlib"
+testpaths = [
+    "apps/api/tests",
+    "libs/backend/tests",
+    "tools/scraper/tests",
+    "tests/integration",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "SIM", "UP"]
+
+[tool.pyright]
+include = [
+    "apps/api/src",
+    "apps/api/tests",
+    "libs/backend/src",
+    "libs/backend/tests",
+    "tools/scraper/src",
+    "tools/scraper/tests",
+    "tests/integration",
+    "tools/check_structure.py",
+]
+pythonVersion = "3.13"
+typeCheckingMode = "strict"
+venv = ".venv"
+venvPath = "."

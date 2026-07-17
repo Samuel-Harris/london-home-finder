@@ -1,0 +1,17 @@
+source_roots = [
+    "apps/api/src",
+    "libs/backend/src",
+    "tools/scraper/src",
+]
+forbid_circular_dependencies = true
+ignore_type_checking_imports = false
+
+exclude = [
+    "**/__pycache__",
+    "**/tests/**",
+    ".venv/**",
+    "apps/api/alembic/**",
+]
+
+[rules]
+unused_ignore_directives = "error"

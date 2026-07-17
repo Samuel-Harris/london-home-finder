@@ -206,6 +206,28 @@ tempCodeRunnerFile.py
 # Ruff stuff:
 .ruff_cache/
 
+# Node.js and Next.js
+node_modules/
+.pnpm-store/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+
+# Local application data
+data/
+*.sqlite
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+
+# Generated reports
+coverage/
+
+# Operating-system metadata
+.DS_Store
+Thumbs.db
+
 # PyPI configuration file
 .pypirc
 

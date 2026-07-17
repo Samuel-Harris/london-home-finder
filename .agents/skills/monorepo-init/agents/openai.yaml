@@ -1,0 +1,4 @@
+interface:
+  display_name: "Monorepo Init"
+  short_description: "Scaffold agent-ready monorepos with boundaries"
+  default_prompt: "Use $monorepo-init to design and scaffold an agent-ready monorepo."

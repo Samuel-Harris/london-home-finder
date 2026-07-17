@@ -1,0 +1,27 @@
+{
+  "name": "london-home-finder",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.13.0",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "boundaries": "depcruise apps/web/src libs/api-client/src --config .dependency-cruiser.cjs --ts-config tsconfig.base.json",
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "dependency-cruiser": "18.1.0",
+    "eslint": "9.39.3",
+    "eslint-config-next": "16.2.10",
+    "prettier": "3.9.5",
+    "turbo": "2.10.5",
+    "typescript": "6.0.2"
+  }
+}

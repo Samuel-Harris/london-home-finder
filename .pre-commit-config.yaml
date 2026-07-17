@@ -1,0 +1,46 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff check
+        entry: uv run ruff check --fix
+        language: system
+        types: [python]
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format
+        language: system
+        types: [python]
+      - id: structure
+        name: repository structure
+        entry: uv run python tools/check_structure.py
+        language: system
+        pass_filenames: false
+      - id: python-boundaries
+        name: Python package boundaries
+        entry: uv run tach check-external
+        language: system
+        pass_filenames: false
+        files: ^(apps/api|libs/backend|tools/scraper)/.*[.]py$
+      - id: python-import-contracts
+        name: Python import contracts
+        entry: uv run lint-imports
+        language: system
+        pass_filenames: false
+        files: ^(apps/api|libs/backend|tools/scraper)/.*[.]py$
+      - id: typescript-boundaries
+        name: TypeScript package boundaries
+        entry: pnpm boundaries
+        language: system
+        pass_filenames: false
+        files: ^(apps/web|libs/api-client)/.*[.](js|jsx|ts|tsx)$
+      - id: frontend-lint
+        name: TypeScript lint and formatting
+        entry: pnpm exec eslint --fix
+        language: system
+        types_or: [javascript, jsx, ts, tsx]
+      - id: prettier
+        name: Prettier
+        entry: pnpm exec prettier --write
+        language: system
+        types_or: [javascript, jsx, json, markdown, ts, tsx, yaml]

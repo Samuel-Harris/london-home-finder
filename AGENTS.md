@@ -1,5 +1,32 @@
 # London Home Finder - Agent Guide
 
+## Repository map
+
+- `apps/api` — deployable FastAPI composition root and API-owned migrations.
+- `apps/web` — deployable Next.js frontend; may import `libs/api-client` only.
+- `libs/backend` — reusable domain and persistence code; imports no apps or tools.
+- `libs/api-client` — generated OpenAPI client plus its small handwritten wrapper.
+- `tools/scraper` — manually invoked ingestion CLI; may import `libs/backend`.
+- `contracts` — generated OpenAPI contract. Do not edit it by hand.
+
+## Commands
+
+- Install: `uv sync --all-packages` then `pnpm install`
+- Format: `uv run just fmt`
+- Test: `uv run just test`
+- Lint: `uv run just lint`
+- Types: `uv run just typecheck`
+- Boundaries: `uv run just boundaries`
+- All checks: `uv run just check`
+
+## Structural boundaries
+
+- Always declare inter-package dependencies in the importing package manifest.
+- Always import backend code through `lhf_backend.api` and frontend API code through `@lhf/api-client`.
+- Ask first before changing dependency direction, adding a top-level directory, or introducing a deployable.
+- Never import one app from another, import generated-client internals directly, or edit generated files.
+- Follow `docs/STRUCTURE.md` for every package, module, or contract change.
+
 ## Working method
 
 - Read every file you will modify and inspect nearby implementations and tests before writing.

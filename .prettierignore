@@ -1,0 +1,11 @@
+.agents/
+.next/
+.import_linter_cache/
+.turbo/
+.venv/
+apps/api/alembic/versions/
+contracts/openapi.json
+libs/api-client/src/generated/
+node_modules/
+pnpm-lock.yaml
+uv.lock

@@ -1,0 +1,31 @@
+{
+  "name": "@lhf/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "lint": "eslint src tests next.config.ts vitest.config.ts --max-warnings=0",
+    "start": "next start",
+    "test": "vitest run",
+    "typecheck": "tsc --build --pretty false"
+  },
+  "dependencies": {
+    "@lhf/api-client": "workspace:*",
+    "next": "16.2.10",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "10.4.1",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.2",
+    "@types/node": "24.9.2",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.3",
+    "jsdom": "29.1.1",
+    "typescript": "6.0.2",
+    "vitest": "4.1.10"
+  }
+}

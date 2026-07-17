@@ -1,0 +1,20 @@
+[
+  {
+    "source": "recorded-example",
+    "external_id": "westminster-001",
+    "title": "Two-bedroom flat near St James's Park",
+    "asking_price_gbp": 825000,
+    "postcode": "SW1H 9LL",
+    "url": "https://example.test/listings/westminster-001",
+    "floor_area_sqm": 72.5
+  },
+  {
+    "source": "recorded-example",
+    "external_id": "hackney-002",
+    "title": "One-bedroom flat in Hackney",
+    "asking_price_gbp": 475000,
+    "postcode": "E8 1EA",
+    "url": "https://example.test/listings/hackney-002",
+    "floor_area_sqm": 48.0
+  }
+]

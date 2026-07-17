@@ -1,0 +1,15 @@
+[project]
+name = "lhf-backend"
+version = "0.1.0"
+description = "Domain and persistence library for London Home Finder"
+requires-python = ">=3.13"
+dependencies = [
+    "SQLAlchemy==2.0.51",
+]
+
+[build-system]
+requires = ["hatchling==1.31.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lhf_backend"]

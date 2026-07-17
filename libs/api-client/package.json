@@ -1,0 +1,30 @@
+{
+  "name": "@lhf/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc --build --pretty false",
+    "check:generated": "node scripts/check-generated.mjs",
+    "generate": "openapi-ts",
+    "lint": "eslint src tests openapi-ts.config.ts --max-warnings=0",
+    "test": "vitest run",
+    "typecheck": "tsc --build --pretty false && tsc --project tsconfig.test.json --noEmit --pretty false"
+  },
+  "dependencies": {
+    "@hey-api/client-fetch": "0.13.1"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "0.99.0",
+    "@types/node": "24.9.2",
+    "typescript": "6.0.2",
+    "vitest": "4.1.10"
+  }
+}

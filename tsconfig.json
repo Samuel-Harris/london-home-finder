@@ -1,0 +1,4 @@
+{
+  "files": [],
+  "references": [{ "path": "libs/api-client" }, { "path": "apps/web" }]
+}

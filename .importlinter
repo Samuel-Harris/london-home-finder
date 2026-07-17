@@ -1,0 +1,22 @@
+[importlinter]
+root_packages =
+    lhf_api
+    lhf_backend
+    lhf_scraper
+include_external_packages = True
+
+[importlinter:contract:package-layers]
+name = Apps and tools are independent above the backend library
+type = layers
+layers =
+    lhf_api | lhf_scraper
+    lhf_backend
+
+[importlinter:contract:backend-public-interface]
+name = Backend private modules are only imported inside the backend package
+type = protected
+protected_modules =
+    lhf_backend._listing
+    lhf_backend._models
+allowed_importers =
+    lhf_backend

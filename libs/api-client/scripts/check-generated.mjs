@@ -45,7 +45,9 @@ try {
     throw generation.error;
   }
   if (generation.status !== 0) {
-    throw new Error(`openapi-ts exited with status ${generation.status ?? "unknown"}`);
+    throw new Error(
+      `openapi-ts exited with status ${generation.status ?? "unknown"}`,
+    );
   }
 
   const [current, expected] = await Promise.all([

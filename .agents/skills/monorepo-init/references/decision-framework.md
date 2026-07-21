@@ -15,7 +15,7 @@ Run the interview one axis at a time. Infer answers from context where possible 
 | **7. Testing strategy?**                      | Fast unit-heavy → colocated tests, per-package pytest/vitest, and affected-scoped CI. Heavy integration → dedicated test packages, testcontainers, and a separate CI stage.                                                                                                                                          |
 | **8. CI budget and speed sensitivity?**       | Tight → Turborepo/Nx remote cache + affected builds; run Tach and lint in pre-commit. Generous → full matrix per PR.                                                                                                                                                                                                 |
 | **9. Expected growth?**                       | Large or polyglot growth → define tags and layers now, keep boundaries strict, and document the build-system migration path in STRUCTURE.md. Stays small → lighter boundaries and fewer layers.                                                                                                                      |
-| **10. Team and agent ownership?**             | Multiple owners → CODEOWNERS per top-level directory + Tach domains (`tach.domain.toml`) for local ownership. Single owner → root-level config with catch-all CODEOWNERS.                                                                                                                                            |
+| **10. Team and agent ownership?**             | Default: no CODEOWNERS. Multiple owners who need review routing → only if the user explicitly asks, add CODEOWNERS per top-level directory plus Tach domains (`tach.domain.toml`) for local ownership. Single owner → skip CODEOWNERS; rely on AGENTS.md and boundary checks.                                      |
 
 ## Thresholds that change the plan
 
@@ -43,7 +43,7 @@ Fill in and present this record at the end of the interview. Every line must tra
 - **Testing:** <e.g. colocated per-package pytest>
 - **Task runner:** <justfile or Makefile>
 - **CI:** <provider; boundary check as required gate; affected-scoping yes/no>
-- **Ownership:** <CODEOWNERS catch-all and per-directory owners>
+- **Ownership:** <none by default; CODEOWNERS only if the user explicitly requests review routing>
 - **Agent instructions:** <AGENTS.md root + per top-level package; optional Codex command-execution rules only when needed>
 - **Explicitly out of scope:** <e.g. Bazel, npm publishing, Kubernetes manifests>
 ```

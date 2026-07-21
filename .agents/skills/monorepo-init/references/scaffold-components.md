@@ -103,18 +103,7 @@ Tell the user to configure the checks job, or a dedicated boundaries job, as a r
 
 ## CODEOWNERS
 
-Place CODEOWNERS at the root or in `.github/`. More-specific later rules override earlier rules. Include a catch-all first and own the ownership configuration itself.
-
-```text
-* @org/maintainers
-/.github/ @org/maintainers
-/services/payments/ @org/payments-team
-/services/orders/ @org/orders-team
-/libs/ @org/platform-team
-/infra/ @org/platform-team
-```
-
-For a single owner, use only the catch-all. For multiple owners, recommend required Code Owner review in branch protection.
+Do not create CODEOWNERS by default. Add it only when the user explicitly asks for code-owner review routing. When requested, place it at the root or in `.github/`, put a catch-all first, and let more-specific later rules override earlier ones.
 
 ## docs/STRUCTURE.md
 
@@ -132,7 +121,7 @@ with `just check` passing and the root AGENTS.md updated.
 2. Register its source root and package with every boundary tool. Add Nx tags or
    dependency-cruiser rules for TypeScript packages.
 3. Declare only dependencies the package actually imports.
-4. Update CODEOWNERS and the root repository map. Run `just check`.
+4. Update the root repository map. Run `just check`.
 
 ## Splitting a module
 

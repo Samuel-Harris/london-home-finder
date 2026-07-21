@@ -195,11 +195,6 @@ def main() -> None:
         if source_root not in boundaries_script:
             errors.append(f"root boundaries script does not cruise {source_root}")
 
-    codeowners = (ROOT / ".github/CODEOWNERS").read_text(encoding="utf-8")
-    for package_path in sorted(package_paths):
-        if f"/{package_path.as_posix()}/" not in codeowners:
-            errors.append(f"CODEOWNERS is missing /{package_path.as_posix()}/")
-
     if errors:
         raise SystemExit("\n".join(errors))
 

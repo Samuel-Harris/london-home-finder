@@ -26,8 +26,7 @@ dependency-cruiser and declared in the importer's `package.json`.
    Linter, or dependency-cruiser as applicable.
 3. Declare only dependencies the package actually imports. Use workspace sources
    or the `workspace:*` protocol for internal dependencies.
-4. Add the package to `.github/CODEOWNERS`, the root repository map, and
-   `tools/check_structure.py`.
+4. Add the package to the root repository map and `tools/check_structure.py`.
 5. Deliberately violate any new boundary once and confirm the boundary command
    reports a legible file-and-line failure. Remove the violation and run
    `uv run just check`.
@@ -61,6 +60,6 @@ the temporary-file SQLite integration tests.
 
 Every structure change updates affected `AGENTS.md` files in the same change.
 `tools/check_structure.py` verifies package instruction files, manifests, and
-canonical task names; it also reconciles uv, pnpm, Tach, Import Linter,
-dependency-cruiser, and CODEOWNERS registrations with the package tree so
-instruction and boundary drift fail in CI.
+canonical task names; it also reconciles uv, pnpm, Tach, Import Linter, and
+dependency-cruiser registrations with the package tree so instruction and
+boundary drift fail in CI.

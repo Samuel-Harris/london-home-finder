@@ -1,6 +1,6 @@
 ---
 name: monorepo-init
-description: Initialise, scaffold, or retrofit a monorepo for structured agentic development with machine-enforced module boundaries, nested AGENTS.md files, pre-commit, CI gates, and CODEOWNERS. Use when starting or restructuring a repository, preparing a codebase for AI-agent development, adding module-boundary enforcement or AGENTS.md files, or repairing structural drift. Supports Python with uv, Tach, and Import Linter; TypeScript with pnpm, Turborepo, and Nx or dependency-cruiser. Do not use for narrow feature work that leaves repository structure unchanged.
+description: Initialise, scaffold, or retrofit a monorepo for structured agentic development with machine-enforced module boundaries, nested AGENTS.md files, pre-commit, and CI gates. Use when starting or restructuring a repository, preparing a codebase for AI-agent development, adding module-boundary enforcement or AGENTS.md files, or repairing structural drift. Supports Python with uv, Tach, and Import Linter; TypeScript with pnpm, Turborepo, and Nx or dependency-cruiser. Do not use for narrow feature work that leaves repository structure unchanged.
 ---
 
 # Monorepo Init
@@ -62,9 +62,10 @@ Produce the complete scaffold:
 5. Root `justfile`, or a Makefile when confirmed, with `test`, `lint`, `typecheck`, `boundaries`, and `check`.
 6. Pre-commit configuration running the fast checks.
 7. CI pipeline with the boundary check as a required gate.
-8. CODEOWNERS with per-directory rules and a catch-all.
-9. At least one fully worked sample module demonstrating every convention: src layout, colocated tests, public interface, workspace sources or tags, passing boundaries, and its own AGENTS.md. Include 2–3 small domain-flavoured functions and tests, but no unrequested application business logic.
-10. `docs/STRUCTURE.md` documenting the safe structure-change process.
+8. At least one fully worked sample module demonstrating every convention: src layout, colocated tests, public interface, workspace sources or tags, passing boundaries, and its own AGENTS.md. Include 2–3 small domain-flavoured functions and tests, but no unrequested application business logic.
+9. `docs/STRUCTURE.md` documenting the safe structure-change process.
+
+Do not scaffold CODEOWNERS unless the user explicitly asks for code-owner review routing.
 
 Recommend Bazel, Pants, or Buck2 only when the design has at least three languages, at least 100 targets or services, and a dedicated build engineer. Never scaffold those systems through this skill.
 

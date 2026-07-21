@@ -1,12 +1,19 @@
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const packageDirectory = join(dirname(fileURLToPath(import.meta.url)), "..");
 const generatedDirectory = join(packageDirectory, "src", "generated");
+const require = createRequire(import.meta.url);
+const openapiTsBinary = join(
+  dirname(require.resolve("@hey-api/openapi-ts/package.json")),
+  "bin",
+  "run.js",
+);
 
 async function snapshot(directory) {
   const entries = await readdir(directory, {
@@ -33,8 +40,8 @@ let generatedClientIsStale = false;
 
 try {
   const generation = spawnSync(
-    "pnpm",
-    ["exec", "openapi-ts", "--output", temporaryDirectory],
+    process.execPath,
+    [openapiTsBinary, "--output", temporaryDirectory],
     {
       cwd: packageDirectory,
       stdio: "inherit",

@@ -79,7 +79,7 @@
   "paths": {
     "/health": {
       "get": {
-        "operationId": "health_health_get",
+        "operationId": "health",
         "responses": {
           "200": {
             "content": {
@@ -100,7 +100,7 @@
     },
     "/listings": {
       "get": {
-        "operationId": "list_listings_listings_get",
+        "operationId": "listListings",
         "responses": {
           "200": {
             "content": {
@@ -109,7 +109,7 @@
                   "items": {
                     "$ref": "#/components/schemas/ListingResponse"
                   },
-                  "title": "Response List Listings Listings Get",
+                  "title": "Response Listlistings",
                   "type": "array"
                 }
               }

@@ -26,7 +26,6 @@ repo/
 ├── .dependency-cruiser.js
 ├── .pre-commit-config.yaml
 ├── .github/workflows/ci.yml
-├── CODEOWNERS
 ├── apps/
 │   ├── api/
 │   │   ├── AGENTS.md

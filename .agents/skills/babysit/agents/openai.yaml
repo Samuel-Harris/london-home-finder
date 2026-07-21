@@ -1,0 +1,4 @@
+interface:
+  display_name: "Babysit PR"
+  short_description: "Keep a GitHub PR green and merge-ready"
+  default_prompt: "Use $babysit to keep this pull request green, resolve actionable feedback, and monitor it until it is merge-ready."

@@ -52,36 +52,36 @@ export type ListingResponse = {
     url: string;
 };
 
-export type HealthHealthGetData = {
+export type HealthData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/health';
 };
 
-export type HealthHealthGetResponses = {
+export type HealthResponses = {
     /**
      * Successful Response
      */
     200: HealthResponse;
 };
 
-export type HealthHealthGetResponse = HealthHealthGetResponses[keyof HealthHealthGetResponses];
+export type HealthResponse2 = HealthResponses[keyof HealthResponses];
 
-export type ListListingsListingsGetData = {
+export type ListListingsData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/listings';
 };
 
-export type ListListingsListingsGetResponses = {
+export type ListListingsResponses = {
     /**
-     * Response List Listings Listings Get
+     * Response Listlistings
      *
      * Successful Response
      */
     200: Array<ListingResponse>;
 };
 
-export type ListListingsListingsGetResponse = ListListingsListingsGetResponses[keyof ListListingsListingsGetResponses];
+export type ListListingsResponse = ListListingsResponses[keyof ListListingsResponses];

@@ -8,9 +8,9 @@ Run a shortened design interview first. Axes 1–4 and 10 usually cover language
 
 Use version-appropriate Tach inspection, dependency-cruiser graphs, or `nx graph` before changing structure. Identify cycles and cross-domain imports. Prioritise one or two boundaries whose violation causes the most harm, then present that map to the user as the basis for migration order.
 
-## 2. Add ownership
+## 2. Ownership
 
-Add CODEOWNERS with a catch-all and per-top-level-directory rules before migration so changes route to the correct reviewers.
+Skip CODEOWNERS unless the user explicitly asks for code-owner review routing. Prefer AGENTS.md and boundary checks for agent navigation.
 
 ## 3. Baseline and ratchet existing violations
 
@@ -32,7 +32,6 @@ Bring each migrated module fully to convention:
 - its own manifest with declared dependencies;
 - colocated tests;
 - boundary configuration or tags;
-- CODEOWNERS entry;
 - passing `tach check-external` where applicable.
 
 Extract a separate service only when scaling, ownership, or compliance requires it. Otherwise preserve a modular monolith.

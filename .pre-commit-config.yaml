@@ -21,13 +21,13 @@ repos:
         entry: uv run tach check-external
         language: system
         pass_filenames: false
-        files: ^(apps/api|libs/backend|tools/scraper)/.*[.]py$
+        files: ^(apps/api|apps/db|libs/db|libs/listings|libs/repository|tools/scraper)/.*[.]py$
       - id: python-import-contracts
         name: Python import contracts
         entry: uv run lint-imports
         language: system
         pass_filenames: false
-        files: ^(apps/api|libs/backend|tools/scraper)/.*[.]py$
+        files: ^(apps/api|apps/db|libs/db|libs/listings|libs/repository|tools/scraper)/.*[.]py$
       - id: typescript-boundaries
         name: TypeScript package boundaries
         entry: pnpm boundaries

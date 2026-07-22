@@ -3,9 +3,11 @@ from typing import cast
 
 from fastapi.testclient import TestClient
 from httpx import Client
-from lhf_api.app import create_app
-from lhf_api.migrations import upgrade_database
-from lhf_backend.api import ListingDraft, ListingRepository, create_session_factory
+from lhf.api.app import create_app
+from lhf.db.session import create_session_factory
+from lhf.db_app.migrations import upgrade_database
+from lhf.listings.listing import ListingDraft
+from lhf.listings.listing_repository import ListingRepository
 
 
 def test_health_endpoint_does_not_require_database_access(tmp_path: Path) -> None:
@@ -17,7 +19,7 @@ def test_health_endpoint_does_not_require_database_access(tmp_path: Path) -> Non
     assert response.json() == {"status": "ok"}
 
 
-def test_listings_endpoint_reads_the_backend_repository(tmp_path: Path) -> None:
+def test_listings_endpoint_reads_the_listings_repository(tmp_path: Path) -> None:
     database_path = tmp_path / "api.sqlite3"
     upgrade_database(database_path)
     repository = ListingRepository(create_session_factory(database_path))

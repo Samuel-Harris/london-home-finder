@@ -1,6 +1,9 @@
 source_roots = [
     "apps/api/src",
-    "libs/backend/src",
+    "apps/db/src",
+    "libs/db/src",
+    "libs/listings/src",
+    "libs/repository/src",
     "tools/scraper/src",
 ]
 forbid_circular_dependencies = true
@@ -10,7 +13,7 @@ exclude = [
     "**/__pycache__",
     "**/tests/**",
     ".venv/**",
-    "apps/api/alembic/**",
+    "apps/db/alembic/**",
 ]
 
 [rules]

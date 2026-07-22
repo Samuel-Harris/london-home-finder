@@ -3,14 +3,16 @@
 A local-first tool for collecting and exploring homes for sale in London.
 It is designed to run from the same checked-out repository on macOS or Windows.
 
-The repository contains two applications:
+The repository contains these applications:
 
 - `apps/api` — a FastAPI API backed by SQLite.
+- `apps/db` — Alembic migrations for the shared SQLite database.
 - `apps/web` — a Next.js App Router frontend.
 
-Reusable backend logic lives in `libs/backend`, the generated TypeScript API
-client lives in `libs/api-client`, and manually invoked data-ingestion commands
-live in `tools/scraper`.
+Listing domain and persistence live in `libs/listings`, shared SQLAlchemy
+instrumentation in `libs/db`, the generated TypeScript API client in
+`libs/api-client`, and manually invoked data-ingestion commands in
+`tools/scraper`.
 
 ## Getting started
 

@@ -1,6 +1,6 @@
 import json
 
-from lhf_api.openapi import render_openapi
+from lhf.api.openapi import render_openapi
 
 
 def test_openapi_contains_the_public_routes() -> None:

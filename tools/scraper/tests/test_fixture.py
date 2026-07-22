@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 import pytest
-from lhf_scraper.fixture import load_fixture
+from lhf.scraper.fixture import load_fixture
 
 
 def test_load_fixture_builds_validated_listing_drafts(tmp_path: Path) -> None:

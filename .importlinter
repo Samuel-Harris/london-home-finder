@@ -1,22 +1,21 @@
 [importlinter]
 root_packages =
-    lhf_api
-    lhf_backend
-    lhf_scraper
+    lhf
 include_external_packages = True
 
 [importlinter:contract:package-layers]
-name = Apps and tools are independent above the backend library
+name = Apps and tools are independent above feature libraries above shared libs
 type = layers
 layers =
-    lhf_api | lhf_scraper
-    lhf_backend
+    lhf.api | lhf.scraper | lhf.db_app
+    lhf.listings
+    lhf.db | lhf.repository
 
-[importlinter:contract:backend-public-interface]
-name = Backend private modules are only imported inside the backend package
+[importlinter:contract:listings-public-interface]
+name = Listings private modules are only imported inside the listings package
 type = protected
 protected_modules =
-    lhf_backend._listing
-    lhf_backend._models
+    lhf.listings._listing_row
 allowed_importers =
-    lhf_backend
+    lhf.listings
+    lhf.db_app

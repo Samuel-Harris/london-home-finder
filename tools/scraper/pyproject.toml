@@ -4,18 +4,20 @@ version = "0.1.0"
 description = "Manual fixture ingestion CLI for London Home Finder"
 requires-python = ">=3.13"
 dependencies = [
-    "lhf-backend",
+    "lhf-db",
+    "lhf-listings",
 ]
 
 [project.scripts]
-lhf-scrape = "lhf_scraper.cli:main"
+lhf-scrape = "lhf.scraper.cli:main"
 
 [tool.uv.sources]
-lhf-backend = { workspace = true }
+lhf-db = { workspace = true }
+lhf-listings = { workspace = true }
 
 [build-system]
 requires = ["hatchling==1.31.0"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/lhf_scraper"]
+packages = ["src/lhf"]

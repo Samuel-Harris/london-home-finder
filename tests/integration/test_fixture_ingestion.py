@@ -1,8 +1,9 @@
 from pathlib import Path
 
-from lhf_api.migrations import upgrade_database
-from lhf_backend.api import ListingRepository, create_session_factory
-from lhf_scraper.fixture import import_fixture
+from lhf.db.session import create_session_factory
+from lhf.db_app.migrations import upgrade_database
+from lhf.listings.listing_repository import ListingRepository
+from lhf.scraper.fixture import import_fixture
 from sqlalchemy import text
 
 FIXTURE_PATH = Path(__file__).parent / "fixtures" / "london_listings.json"

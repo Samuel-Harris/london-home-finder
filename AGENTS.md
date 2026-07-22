@@ -2,11 +2,15 @@
 
 ## Repository map
 
-- `apps/api` — deployable FastAPI composition root and API-owned migrations.
+- `apps/api` — deployable FastAPI composition root.
+- `apps/db` — sole Alembic history and migrate CLI composition root.
 - `apps/web` — deployable Next.js frontend; may import `libs/api-client` only.
-- `libs/backend` — reusable domain and persistence code; imports no apps or tools.
+- `libs/db` — shared SQLAlchemy Base, metadata, and SQLite session factory.
+- `libs/repository` — shared `Repository` protocol for upsert/list persistence.
+- `libs/listings` — listing domain, ORM models, and repository; imports `libs/db`
+  and `libs/repository`.
 - `libs/api-client` — generated OpenAPI client plus its small handwritten wrapper.
-- `tools/scraper` — manually invoked ingestion CLI; may import `libs/backend`.
+- `tools/scraper` — manually invoked ingestion CLI; may import `libs/listings` and `libs/db`.
 - `contracts` — generated OpenAPI contract. Do not edit it by hand.
 
 ## Commands
@@ -22,7 +26,11 @@
 ## Structural boundaries
 
 - Always declare inter-package dependencies in the importing package manifest.
-- Always import backend code through `lhf_backend.api` and frontend API code through `@lhf/api-client`.
+- Never use Python barrel modules (re-export-only files such as `api.py`). Import the
+  concrete module that owns the symbol (for example `lhf.db.base`, `lhf.db.session`,
+  `lhf.listings.listing`). Leading-underscore modules stay package-private.
+- Python packages share the `lhf` namespace (`lhf.db`, `lhf.listings`, `lhf.api`, …).
+- Always import frontend API code through `@lhf/api-client`.
 - Ask first before changing dependency direction, adding a top-level directory, or introducing a deployable.
 - Never import one app from another, import generated-client internals directly, or edit generated files.
 - Follow `docs/STRUCTURE.md` for every package, module, or contract change.

@@ -10,21 +10,32 @@ _POSTCODE_PATTERN = re.compile(r"^[A-Z]{1,2}\d[A-Z\d]?\d[A-Z]{2}$")
 class ListingDraft:
     source: str
     external_id: str
-    title: str
-    asking_price_gbp: int
-    postcode: str
     url: str
+    display_address: str | None = None
+    asking_price_gbp: int | None = None
+    price_qualifier: str | None = None
+    bedrooms: int | None = None
+    postcode: str | None = None
     floor_area_sqm: float | None = None
+    tenure_type: str | None = None
+    years_remaining_on_lease: int | None = None
+    annual_service_charge_gbp: int | None = None
+    annual_ground_rent_gbp: int | None = None
 
     def __post_init__(self) -> None:
-        for field_name in ("source", "external_id", "title", "url"):
+        for field_name in ("source", "external_id", "url"):
             if not getattr(self, field_name).strip():
                 raise ValueError(f"{field_name} must not be blank")
-        if self.asking_price_gbp <= 0:
+        if self.asking_price_gbp is not None and self.asking_price_gbp <= 0:
             raise ValueError("asking_price_gbp must be positive")
         if self.floor_area_sqm is not None and self.floor_area_sqm <= 0:
             raise ValueError("floor_area_sqm must be positive when provided")
-        object.__setattr__(self, "postcode", normalise_postcode(self.postcode))
+        if self.years_remaining_on_lease is not None and self.years_remaining_on_lease <= 0:
+            raise ValueError("years_remaining_on_lease must be positive when provided")
+        if self.postcode is None or not self.postcode.strip():
+            object.__setattr__(self, "postcode", None)
+        else:
+            object.__setattr__(self, "postcode", normalise_postcode(self.postcode))
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,11 +43,17 @@ class Listing:
     id: int
     source: str
     external_id: str
-    title: str
-    asking_price_gbp: int
-    postcode: str
     url: str
+    display_address: str | None
+    asking_price_gbp: int | None
+    price_qualifier: str | None
+    bedrooms: int | None
+    postcode: str | None
     floor_area_sqm: float | None
+    tenure_type: str | None
+    years_remaining_on_lease: int | None
+    annual_service_charge_gbp: int | None
+    annual_ground_rent_gbp: int | None
 
 
 def normalise_postcode(postcode: str) -> str:

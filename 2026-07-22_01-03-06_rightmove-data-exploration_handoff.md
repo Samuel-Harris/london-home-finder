@@ -11,17 +11,20 @@
 **Project:** `london-home-finder` monorepo — personal tool to help find a house to buy in London.
 
 **Repo state (brownfield):** Fixture-only ingestion exists; no live Rightmove scraper.
+
 - Scraper CLI: `import-fixture` → `ListingDraft` → SQLite upsert
 - Domain `Listing`: `source`, `external_id`, `title`, `asking_price_gbp`, `postcode`, `url`, `floor_area_sqm`
 - API: `GET /listings`; web app does not yet render listings
 
 **Interview outcomes (passed at 12% ambiguity):**
-- Goal of *this* work: inventory available data + technical scrape issues (not build).
+
+- Goal of _this_ work: inventory available data + technical scrape issues (not build).
 - User interest set = **core economics**: price, beds, location/postcode, size when present, tenure/lease years, service charge/ground rent when present.
 - Scope of data sources: **search results + detail pages**.
 - Legal/ToS: observed and noted; user chose **technical-only** evaluation for this exploration (defer legal decision).
 
 **Key technical findings:**
+
 - Search embeds clean JSON in `__NEXT_DATA__` → `props.pageProps.searchResults.properties`.
 - Detail embeds packed `window.__PAGE_MODEL = { data: "<json array string>" }` requiring index-graph unpack.
 - Pagination hard-caps at **42 pages / index 984 / ~1,008 listings** per search, even when `resultCount` is ~60k.
@@ -41,12 +44,14 @@ No application/source code was modified. No commits.
 ```
 
 **Ephemeral local artefacts (not in repo; may still exist on disk):**
+
 - `/tmp/rm-find.html` — saved London search HTML
 - `/tmp/rm-detail.html` — sample detail HTML (`/properties/88696923`)
 - `/tmp/rm-detail-unpacked.json` — unpacked `__PAGE_MODEL` for that listing
 - Uploaded copy: `~/.cursor/projects/.../uploads/find-0.html` (markdown/accessibility capture; less useful than live `__NEXT_DATA__`)
 
 **Key existing code (unchanged, for future build context):**
+
 - `tools/scraper/src/lhf_scraper/cli.py` — CLI entry (`import-fixture` only)
 - `tools/scraper/src/lhf_scraper/fixture.py` — JSON → `ListingDraft`
 - `libs/backend/src/lhf_backend/_listing.py` — domain model

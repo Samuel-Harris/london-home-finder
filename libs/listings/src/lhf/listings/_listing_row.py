@@ -12,8 +12,55 @@ class ListingRow(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     source: Mapped[str] = mapped_column(String(100))
     external_id: Mapped[str] = mapped_column(String(200))
-    title: Mapped[str] = mapped_column(String(500))
-    asking_price_gbp: Mapped[int] = mapped_column(Integer)
-    postcode: Mapped[str] = mapped_column(String(8), index=True)
     url: Mapped[str] = mapped_column(String(2048))
-    floor_area_sqm: Mapped[float | None] = mapped_column(Float, nullable=True)
+    display_address: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True,
+        comment="Rightmove display address",
+    )
+    asking_price_gbp: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+        comment="Numeric asking price in GBP; NULL for POA",
+    )
+    price_qualifier: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+        comment="Qualifier that changes the price's meaning (Guide Price, OIEO, From, …)",
+    )
+    bedrooms: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+        comment="Bedroom count",
+    )
+    postcode: Mapped[str | None] = mapped_column(
+        String(8),
+        nullable=True,
+        index=True,
+        comment="Normalised UK postcode from detail address.outcode + address.incode",
+    )
+    floor_area_sqm: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+        comment="Size in square metres",
+    )
+    tenure_type: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+        comment="Rightmove tenure.tenureType as stored",
+    )
+    years_remaining_on_lease: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+        comment="Remaining lease years; NULL when not a positive leasehold figure",
+    )
+    annual_service_charge_gbp: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+        comment="Annual service charge",
+    )
+    annual_ground_rent_gbp: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+        comment="Annual ground rent",
+    )

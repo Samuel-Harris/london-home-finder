@@ -8,10 +8,10 @@ EntityT = TypeVar("EntityT")
 
 
 class Repository(Protocol[DraftT, EntityT]):
-    """Upsert drafts and list persisted entities."""
+    """Replace persisted rows from drafts and list entities."""
 
-    def upsert(self, drafts: Iterable[DraftT]) -> int:
-        """Persist drafts, replacing existing rows on natural-key conflict."""
+    def replace_all(self, drafts: Iterable[DraftT]) -> int:
+        """Replace every persisted row with the given drafts in one transaction."""
         ...
 
     def list_all(self) -> list[EntityT]:

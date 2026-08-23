@@ -3,6 +3,7 @@ default: check
 install:
     uv sync --all-packages
     pnpm install
+    uv run playwright install chromium
 
 fmt:
     uv run ruff format .
@@ -45,9 +46,13 @@ generate-contract:
 migrate database_path="data/london-home-finder.sqlite3":
     uv run python -m lhf.db_app.migrations "{{database_path}}"
 
-import-fixture fixture database_path="data/london-home-finder.sqlite3":
+[arg("min_price", long="min-price")]
+[arg("max_price", long="max-price")]
+[arg("max_pages", long="max-pages")]
+[arg("resume", long="resume", value="true")]
+scrape database_path="data/london-home-finder.sqlite3" min_price="300000" max_price="1000000" max_pages="" resume="":
     uv run python -m lhf.db_app.migrations "{{database_path}}"
-    uv run lhf-scrape import-fixture "{{fixture}}" --database "{{database_path}}"
+    uv run lhf-scrape --database "{{database_path}}" --min-price "{{min_price}}" --max-price "{{max_price}}" {{ if max_pages != "" { "--max-pages " + max_pages } else { "" } }} {{ if resume != "" { "--resume" } else { "" } }}
 
 dev-api: migrate
     uv run uvicorn lhf.api.app:app --reload

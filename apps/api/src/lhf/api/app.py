@@ -21,11 +21,17 @@ class ListingResponse(BaseModel):
     id: int
     source: str
     external_id: str
-    title: str
-    asking_price_gbp: int
-    postcode: str
     url: str
+    display_address: str | None
+    asking_price_gbp: int | None
+    price_qualifier: str | None
+    bedrooms: int | None
+    postcode: str | None
     floor_area_sqm: float | None
+    tenure_type: str | None
+    years_remaining_on_lease: int | None
+    annual_service_charge_gbp: int | None
+    annual_ground_rent_gbp: int | None
 
 
 def create_app(database_path: str | Path | None = None) -> FastAPI:

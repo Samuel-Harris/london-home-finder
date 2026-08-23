@@ -19,9 +19,25 @@ export type HealthResponse = {
  */
 export type ListingResponse = {
     /**
+     * Annual Ground Rent Gbp
+     */
+    annual_ground_rent_gbp: number | null;
+    /**
+     * Annual Service Charge Gbp
+     */
+    annual_service_charge_gbp: number | null;
+    /**
      * Asking Price Gbp
      */
-    asking_price_gbp: number;
+    asking_price_gbp: number | null;
+    /**
+     * Bedrooms
+     */
+    bedrooms: number | null;
+    /**
+     * Display Address
+     */
+    display_address: string | null;
     /**
      * External Id
      */
@@ -37,19 +53,27 @@ export type ListingResponse = {
     /**
      * Postcode
      */
-    postcode: string;
+    postcode: string | null;
+    /**
+     * Price Qualifier
+     */
+    price_qualifier: string | null;
     /**
      * Source
      */
     source: string;
     /**
-     * Title
+     * Tenure Type
      */
-    title: string;
+    tenure_type: string | null;
     /**
      * Url
      */
     url: string;
+    /**
+     * Years Remaining On Lease
+     */
+    years_remaining_on_lease: number | null;
 };
 
 export type HealthData = {

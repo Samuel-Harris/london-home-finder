@@ -21,6 +21,7 @@ Install Python 3.13, Node.js 24, uv, and pnpm, then run:
 ```shell
 uv sync --all-packages
 pnpm install
+uv run playwright install chromium
 uv run just generate-contract
 uv run just check
 ```
@@ -33,7 +34,9 @@ uv run just dev-web
 ```
 
 `dev-api` applies the Alembic migrations to `data/london-home-finder.sqlite3`
-before starting the local server.
+before starting the local server. Ingest listings with `uv run just scrape`
+(London BUY, £300k–£1M by default; pass `--max-pages N` to cap search pages,
+or `uv run just scrape --resume` to continue an interrupted run).
 
 Run `uv run just --list` for all repository commands. See
 `docs/STRUCTURE.md` before adding or moving a package.

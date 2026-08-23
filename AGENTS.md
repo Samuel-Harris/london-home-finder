@@ -6,16 +6,19 @@
 - `apps/db` — sole Alembic history and migrate CLI composition root.
 - `apps/web` — deployable Next.js frontend; may import `libs/api-client` only.
 - `libs/db` — shared SQLAlchemy Base, metadata, and SQLite session factory.
-- `libs/repository` — shared `Repository` protocol for upsert/list persistence.
+- `libs/repository` — shared `Repository` protocol for replace_all/list persistence.
 - `libs/listings` — listing domain, ORM models, and repository; imports `libs/db`
   and `libs/repository`.
 - `libs/api-client` — generated OpenAPI client plus its small handwritten wrapper.
-- `tools/scraper` — manually invoked ingestion CLI; may import `libs/listings` and `libs/db`.
+- `tools/scraper` — manually invoked Rightmove HTML ingest CLI (adaptive
+  `find.html` price shards, default £300k–£1M, opt-in `--resume` sidecar
+  checkpoint); may import `libs/listings` and `libs/db`.
 - `contracts` — generated OpenAPI contract. Do not edit it by hand.
 
 ## Commands
 
-- Install: `uv sync --all-packages` then `pnpm install`
+- Install: `uv sync --all-packages` then `pnpm install`. For scrape, also
+  `uv run playwright install chromium`.
 - Format: `uv run just fmt`
 - Test: `uv run just test`
 - Lint: `uv run just lint`

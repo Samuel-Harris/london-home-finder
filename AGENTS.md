@@ -11,7 +11,7 @@
   and `libs/repository`.
 - `libs/api-client` — generated OpenAPI client plus its small handwritten wrapper.
 - `tools/scraper` — manually invoked Rightmove HTML ingest CLI (adaptive
-  `find.html` price shards, default £300k–£1M, opt-in `--resume` sidecar
+  `find.html` price shards, default £350k–£800k 2+ bed freehold houses, opt-in `--resume` sidecar
   checkpoint); may import `libs/listings` and `libs/db`.
 - `contracts` — generated OpenAPI contract. Do not edit it by hand.
 

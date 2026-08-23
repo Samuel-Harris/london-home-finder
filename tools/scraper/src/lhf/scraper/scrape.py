@@ -20,8 +20,11 @@ from lhf.scraper.map_listing import map_listing
 from lhf.scraper.search import SearchCard, SearchPage, parse_search_page
 from lhf.scraper.shards import SearchFilter, search_url, split_filter
 
-DEFAULT_MIN_PRICE = 300_000
-DEFAULT_MAX_PRICE = 1_000_000
+DEFAULT_MIN_PRICE = 350_000
+DEFAULT_MAX_PRICE = 800_000
+DEFAULT_MIN_BEDROOMS = 2
+DEFAULT_PROPERTY_TYPES = ("detached", "semi-detached", "terraced", "bungalow")
+DEFAULT_TENURE = "FREEHOLD"
 MAX_SEARCH_INDEX = 984
 SEARCH_PAGE_SIZE = 24
 PAGE_RESULT_CAP = 1008
@@ -32,11 +35,23 @@ def scrape(
     min_price: int = DEFAULT_MIN_PRICE,
     max_price: int = DEFAULT_MAX_PRICE,
     max_pages: int | None = None,
+    min_bedrooms: int | None = DEFAULT_MIN_BEDROOMS,
+    property_types: tuple[str, ...] | None = DEFAULT_PROPERTY_TYPES,
+    tenure: str | None = DEFAULT_TENURE,
     resume: bool = False,
 ) -> int:
-    _validate_args(min_price, max_price, max_pages)
+    _validate_args(min_price, max_price, max_pages, min_bedrooms)
     path = checkpoint_path(database_path)
-    state = _load_or_start(path, min_price, max_price, max_pages, resume)
+    state = _load_or_start(
+        path,
+        min_price,
+        max_price,
+        max_pages,
+        min_bedrooms,
+        property_types,
+        tenure,
+        resume,
+    )
     with Fetcher() as fetcher:
         _walk_search(fetcher, state, path)
         _walk_details(fetcher, state, path)
@@ -46,13 +61,20 @@ def scrape(
     return count
 
 
-def _validate_args(min_price: int, max_price: int, max_pages: int | None) -> None:
+def _validate_args(
+    min_price: int,
+    max_price: int,
+    max_pages: int | None,
+    min_bedrooms: int | None,
+) -> None:
     if min_price <= 0:
         raise ValueError("min_price must be positive")
     if max_price < min_price:
         raise ValueError("max_price must not be less than min_price")
     if max_pages is not None and max_pages <= 0:
         raise ValueError("max_pages must be positive")
+    if min_bedrooms is not None and min_bedrooms < 0:
+        raise ValueError("min_bedrooms must not be negative")
 
 
 def _load_or_start(
@@ -60,6 +82,9 @@ def _load_or_start(
     min_price: int,
     max_price: int,
     max_pages: int | None,
+    min_bedrooms: int | None,
+    property_types: tuple[str, ...] | None,
+    tenure: str | None,
     resume: bool,
 ) -> Checkpoint:
     if resume:
@@ -68,17 +93,29 @@ def _load_or_start(
             state.min_price != min_price
             or state.max_price != max_price
             or state.max_pages != max_pages
+            or state.min_bedrooms != min_bedrooms
+            or state.property_types != property_types
+            or state.tenure != tenure
         ):
             raise ValueError(
                 "scrape checkpoint does not match "
-                f"min_price={min_price} max_price={max_price} max_pages={max_pages!r}"
+                f"min_price={min_price} max_price={max_price} max_pages={max_pages!r} "
+                f"min_bedrooms={min_bedrooms!r} property_types={property_types!r} "
+                f"tenure={tenure!r}"
             )
         print(_resume_banner(state), file=sys.stderr)
         return state
     if path.exists():
         print(f"warning: discarding incomplete scrape checkpoint at {path}", file=sys.stderr)
     clear_checkpoint(path)
-    state = new_checkpoint(min_price, max_price, max_pages)
+    state = new_checkpoint(
+        min_price,
+        max_price,
+        max_pages,
+        min_bedrooms=min_bedrooms,
+        property_types=property_types,
+        tenure=tenure,
+    )
     save_checkpoint(path, state)
     return state
 
@@ -96,7 +133,13 @@ def _resume_banner(state: Checkpoint) -> str:
 def _walk_search(fetcher: Fetcher, state: Checkpoint, path: Path) -> None:
     if state.phase != "search":
         return
-    window = SearchFilter(min_price=state.min_price, max_price=state.max_price)
+    window = SearchFilter(
+        min_price=state.min_price,
+        max_price=state.max_price,
+        min_bedrooms=state.min_bedrooms,
+        property_types=state.property_types,
+        tenure=state.tenure,
+    )
     pending = state.pending_filters
     while True:
         if state.max_pages is not None and state.pages_used >= state.max_pages:
@@ -183,6 +226,10 @@ def _filter_label(search_filter: SearchFilter) -> str:
         parts.append(f"minBedrooms={search_filter.min_bedrooms}")
     if search_filter.max_bedrooms is not None:
         parts.append(f"maxBedrooms={search_filter.max_bedrooms}")
+    if search_filter.property_types:
+        parts.append("propertyTypes=" + ",".join(search_filter.property_types))
+    if search_filter.tenure is not None:
+        parts.append(f"tenureTypes={search_filter.tenure}")
     return " ".join(parts)
 
 

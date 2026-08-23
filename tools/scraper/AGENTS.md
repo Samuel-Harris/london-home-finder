@@ -4,9 +4,11 @@ Purpose: manually invoked live Rightmove HTML ingest into SQLite.
 Layer: tool; may import concrete modules from `lhf.listings` and `lhf.db` (not barrels).
 Commands: `uv run pytest tools/scraper/tests` and `uv run pyright tools/scraper`.
 Conventions: `just scrape` is the only user entrypoint. Defaults are London BUY
-REGION 87490, £300,000–£1,000,000 inclusive, and every in-cap search page.
-Override with `just scrape --min-price N --max-price N` and optional
-`--max-pages N` (omit for all pages). `just scrape --resume` continues the
+REGION 87490, £350,000–£800,000 inclusive, min 2 bedrooms, detached/
+semi-detached/terraced/bungalow, FREEHOLD, and every in-cap search page.
+Override with `just scrape --min-price N --max-price N --min-bedrooms N`,
+`--property-types csv`, `--tenure FREEHOLD|any`, and optional `--max-pages N`
+(omit for all pages). `just scrape --resume` continues the
 sidecar `{database}.scrape-checkpoint.json` when the window flags match;
 listings are replaced only when a run completes, then the checkpoint is
 deleted. A fresh `just scrape` warns and discards a leftover checkpoint.

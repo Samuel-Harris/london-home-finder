@@ -35,7 +35,7 @@ uv run just dev-web
 
 `dev-api` applies the Alembic migrations to `data/london-home-finder.sqlite3`
 before starting the local server. Ingest listings with `uv run just scrape`
-(London BUY, £300k–£1M by default; pass `--max-pages N` to cap search pages,
+(London BUY, £350k–£800k, 2+ bed freehold houses by default; pass `--max-pages N` to cap search pages,
 or `uv run just scrape --resume` to continue an interrupted run).
 
 Run `uv run just --list` for all repository commands. See

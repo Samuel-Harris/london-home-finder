@@ -128,18 +128,18 @@ def test_scrape_splits_overflow_and_unions_in_band_ids(
         if "index" in params:
             return EMPTY_SEARCH
         min_price, max_price = params["minPrice"], params["maxPrice"]
-        if min_price == "300000" and max_price == "1000000":
+        if min_price == "350000" and max_price == "800000":
             return _search_html(2000, [_property(999999, 400_000)])
-        if min_price == "300000" and max_price == "650000":
+        if min_price == "350000" and max_price == "575000":
             return _search_html(
                 3,
                 [
                     _property(111111, None),
-                    _property(222222, 650_000),
+                    _property(222222, 500_000),
                     _property(333333, 2_000_000),
                 ],
             )
-        if min_price == "650001" and max_price == "1000000":
+        if min_price == "575001" and max_price == "800000":
             return _search_html(
                 2,
                 [
@@ -155,12 +155,15 @@ def test_scrape_splits_overflow_and_unions_in_band_ids(
     listings = ListingRepository(create_session_factory(database_path)).list_all()
     assert [listing.external_id for listing in listings] == ["111111", "222222", "444444"]
     search_urls = [url for url in fetched if "find.html" in url]
-    assert any(_query(url)["maxPrice"] == "650000" for url in search_urls)
-    assert any(_query(url)["minPrice"] == "650001" for url in search_urls)
+    assert any(_query(url)["maxPrice"] == "575000" for url in search_urls)
+    assert any(_query(url)["minPrice"] == "575001" for url in search_urls)
     assert "999999" not in {listing.external_id for listing in listings}
     stderr = capsys.readouterr().err
-    assert "minPrice=300000 maxPrice=650000 resultCount=3" in stderr
-    assert "minPrice=650001 maxPrice=1000000 resultCount=2" in stderr
+    shard = (
+        "minBedrooms=2 propertyTypes=detached,semi-detached,terraced,bungalow tenureTypes=FREEHOLD"
+    )
+    assert f"minPrice=350000 maxPrice=575000 {shard} resultCount=3" in stderr
+    assert f"minPrice=575001 maxPrice=800000 {shard} resultCount=2" in stderr
 
 
 def test_atomic_overflow_does_not_wipe_existing_rows(
@@ -207,11 +210,11 @@ def test_max_pages_stops_after_one_in_cap_search_page(
         if "index" in params:
             return _search_html(2, [_property(555555, 400_000)])
         min_price, max_price = params["minPrice"], params["maxPrice"]
-        if min_price == "300000" and max_price == "1000000":
+        if min_price == "350000" and max_price == "800000":
             return _search_html(2000, [_property(999999, 400_000)])
-        if min_price == "300000" and max_price == "650000":
+        if min_price == "350000" and max_price == "575000":
             return (FIXTURES / "search.html").read_text(encoding="utf-8")
-        if min_price == "650001" and max_price == "1000000":
+        if min_price == "575001" and max_price == "800000":
             return _search_html(2, [_property(444444, 800_000)])
         raise FetchError(f"unexpected url {url}")
 
@@ -222,7 +225,7 @@ def test_max_pages_stops_after_one_in_cap_search_page(
     assert [listing.external_id for listing in listings] == ["111111", "222222"]
     search_urls = [url for url in fetched if "find.html" in url]
     assert not any("index=" in url for url in search_urls)
-    assert not any(_query(url).get("minPrice") == "650001" for url in search_urls)
+    assert not any(_query(url).get("minPrice") == "575001" for url in search_urls)
 
 
 def test_unlimited_pages_paginates_until_empty(
@@ -325,10 +328,10 @@ def test_resume_continues_search_from_failed_index(
     assert not checkpoint_path(database_path).exists()
     assert any(_query(url).get("index") == "48" for url in fetched if "find.html" in url)
     stderr = capsys.readouterr().err
-    assert (
-        "resuming scrape phase=search pages_used=2 cards=3 pending=0"
-        " active=minPrice=300000 maxPrice=1000000 next_index=48"
-    ) in stderr
+    assert "resuming scrape phase=search pages_used=2 cards=3 pending=0" in stderr
+    assert "active=minPrice=350000 maxPrice=800000 minBedrooms=2" in stderr
+    assert "propertyTypes=detached,semi-detached,terraced,bungalow" in stderr
+    assert "tenureTypes=FREEHOLD next_index=48" in stderr
 
 
 def test_resume_skips_saved_detail(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -398,7 +401,7 @@ def test_resume_window_mismatch_does_not_fetch_and_keeps_file(
 
     with pytest.raises(
         ValueError,
-        match="scrape checkpoint does not match min_price=300000 max_price=1000000 max_pages=None",
+        match="scrape checkpoint does not match min_price=350000 max_price=800000",
     ):
         scrape(database_path, resume=True)
     assert path.is_file()
@@ -411,7 +414,7 @@ def test_fresh_scrape_discards_leftover_checkpoint_and_fetches_root(
 ) -> None:
     database_path = tmp_path / "scrape.sqlite3"
     upgrade_database(database_path)
-    leftover = new_checkpoint(300_000, 1_000_000, None)
+    leftover = new_checkpoint(350_000, 800_000, None)
     leftover.active = ActiveShard(
         filter=SearchFilter(min_price=500_000, max_price=500_000, min_bedrooms=2, max_bedrooms=4),
         next_index=48,
@@ -434,11 +437,12 @@ def test_fresh_scrape_discards_leftover_checkpoint_and_fetches_root(
     assert f"warning: discarding incomplete scrape checkpoint at {path}" in stderr
     first_search = next(url for url in fetched if "find.html" in url)
     params = _query(first_search)
-    assert params["minPrice"] == "300000"
-    assert params["maxPrice"] == "1000000"
-    assert "minBedrooms" not in params
+    assert params["minPrice"] == "350000"
+    assert params["maxPrice"] == "800000"
+    assert params["minBedrooms"] == "2"
     assert "maxBedrooms" not in params
-    assert not any(_query(url).get("minBedrooms") == "2" for url in fetched if "find.html" in url)
+    assert params["propertyTypes"] == "detached,semi-detached,terraced,bungalow"
+    assert params["tenureTypes"] == "FREEHOLD"
 
 
 def _recorded_get(_self: object, url: str) -> str:

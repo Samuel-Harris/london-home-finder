@@ -70,3 +70,50 @@ def test_search_url_includes_index_and_bed_bounds() -> None:
     assert "minBedrooms=0" in url
     assert "maxBedrooms=10" in url
     assert "index=24" in url
+
+
+def test_split_filter_copies_property_types_and_tenure() -> None:
+    lower, upper = split_filter(
+        SearchFilter(
+            min_price=350_000,
+            max_price=800_000,
+            min_bedrooms=2,
+            property_types=("detached", "terraced"),
+            tenure="FREEHOLD",
+        )
+    )
+
+    assert lower.property_types == ("detached", "terraced")
+    assert upper.property_types == ("detached", "terraced")
+    assert lower.tenure == "FREEHOLD"
+    assert upper.tenure == "FREEHOLD"
+    assert lower.min_bedrooms == 2
+    assert upper.min_bedrooms == 2
+
+
+def test_search_url_includes_house_and_tenure_filters() -> None:
+    url = search_url(
+        SearchFilter(
+            min_price=350_000,
+            max_price=800_000,
+            min_bedrooms=2,
+            property_types=("detached", "semi-detached", "terraced", "bungalow"),
+            tenure="FREEHOLD",
+        ),
+        0,
+    )
+
+    assert "minPrice=350000" in url
+    assert "maxPrice=800000" in url
+    assert "minBedrooms=2" in url
+    assert "maxBedrooms" not in url
+    assert "propertyTypes=detached,semi-detached,terraced,bungalow" in url
+    assert "tenureTypes=FREEHOLD" in url
+    assert "index=" not in url
+
+
+def test_search_url_omits_any_property_types_and_tenure() -> None:
+    url = search_url(SearchFilter(min_price=350_000, max_price=800_000), 0)
+
+    assert "propertyTypes=" not in url
+    assert "tenureTypes=" not in url

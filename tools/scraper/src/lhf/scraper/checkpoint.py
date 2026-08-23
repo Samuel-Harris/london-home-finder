@@ -27,6 +27,9 @@ class Checkpoint:
     min_price: int
     max_price: int
     max_pages: int | None
+    min_bedrooms: int | None
+    property_types: tuple[str, ...] | None
+    tenure: str | None
     search_url_base: str
     phase: Phase
     pages_used: int
@@ -40,16 +43,34 @@ def checkpoint_path(database_path: str | Path) -> Path:
     return Path(f"{database_path}.scrape-checkpoint.json")
 
 
-def new_checkpoint(min_price: int, max_price: int, max_pages: int | None) -> Checkpoint:
+def new_checkpoint(
+    min_price: int,
+    max_price: int,
+    max_pages: int | None,
+    min_bedrooms: int | None = None,
+    property_types: tuple[str, ...] | None = None,
+    tenure: str | None = None,
+) -> Checkpoint:
     return Checkpoint(
         version=CHECKPOINT_VERSION,
         min_price=min_price,
         max_price=max_price,
         max_pages=max_pages,
+        min_bedrooms=min_bedrooms,
+        property_types=property_types,
+        tenure=tenure,
         search_url_base=SEARCH_URL,
         phase="search",
         pages_used=0,
-        pending_filters=[SearchFilter(min_price=min_price, max_price=max_price)],
+        pending_filters=[
+            SearchFilter(
+                min_price=min_price,
+                max_price=max_price,
+                min_bedrooms=min_bedrooms,
+                property_types=property_types,
+                tenure=tenure,
+            )
+        ],
         active=None,
         cards=[],
         details={},
@@ -104,6 +125,9 @@ def _checkpoint_from_payload(data: dict[str, object]) -> Checkpoint:
         min_price=_int(data["min_price"]),
         max_price=_int(data["max_price"]),
         max_pages=_optional_int(data["max_pages"]),
+        min_bedrooms=_optional_int(data.get("min_bedrooms")),
+        property_types=_optional_str_tuple(data.get("property_types")),
+        tenure=_optional_str(data.get("tenure")),
         search_url_base=search_url_base,
         phase=phase,
         pages_used=_int(data["pages_used"]),
@@ -128,6 +152,8 @@ def _search_filter(raw: object) -> SearchFilter:
         max_price=_int(data["max_price"]),
         min_bedrooms=_optional_int(data["min_bedrooms"]),
         max_bedrooms=_optional_int(data["max_bedrooms"]),
+        property_types=_optional_str_tuple(data.get("property_types")),
+        tenure=_optional_str(data.get("tenure")),
     )
 
 
@@ -242,6 +268,12 @@ def _optional_int(raw: object) -> int | None:
     if raw is None:
         return None
     return _int(raw)
+
+
+def _optional_str_tuple(raw: object) -> tuple[str, ...] | None:
+    if raw is None:
+        return None
+    return tuple(_str(item) for item in _array(raw))
 
 
 def _optional_float(raw: object) -> float | None:

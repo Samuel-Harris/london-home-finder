@@ -31,9 +31,17 @@ export type ListingResponse = {
      */
     asking_price_gbp: number | null;
     /**
+     * Bathrooms
+     */
+    bathrooms: number | null;
+    /**
      * Bedrooms
      */
     bedrooms: number | null;
+    /**
+     * Description
+     */
+    description: string | null;
     /**
      * Display Address
      */
@@ -43,13 +51,49 @@ export type ListingResponse = {
      */
     external_id: string;
     /**
+     * First Visible Date
+     */
+    first_visible_date: string | null;
+    /**
      * Floor Area Sqm
      */
     floor_area_sqm: number | null;
     /**
+     * Garden
+     */
+    garden: string | null;
+    /**
      * Id
      */
     id: number;
+    /**
+     * Key Features
+     */
+    key_features: string | null;
+    /**
+     * Latitude
+     */
+    latitude: number | null;
+    /**
+     * Listing Update Date
+     */
+    listing_update_date: string | null;
+    /**
+     * Listing Update Reason
+     */
+    listing_update_reason: string | null;
+    /**
+     * Longitude
+     */
+    longitude: number | null;
+    /**
+     * Nearest Stations
+     */
+    nearest_stations: Array<NearestStationResponse> | null;
+    /**
+     * Parking
+     */
+    parking: string | null;
     /**
      * Postcode
      */
@@ -58,6 +102,14 @@ export type ListingResponse = {
      * Price Qualifier
      */
     price_qualifier: string | null;
+    /**
+     * Property Sub Type
+     */
+    property_sub_type: string | null;
+    /**
+     * Property Type
+     */
+    property_type: string | null;
     /**
      * Source
      */
@@ -74,6 +126,28 @@ export type ListingResponse = {
      * Years Remaining On Lease
      */
     years_remaining_on_lease: number | null;
+};
+
+/**
+ * NearestStationResponse
+ */
+export type NearestStationResponse = {
+    /**
+     * Distance
+     */
+    distance: number | null;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Types
+     */
+    types: Array<string>;
+    /**
+     * Unit
+     */
+    unit: string | null;
 };
 
 export type HealthData = {

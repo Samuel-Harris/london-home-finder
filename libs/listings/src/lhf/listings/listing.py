@@ -7,6 +7,14 @@ _POSTCODE_PATTERN = re.compile(r"^[A-Z]{1,2}\d[A-Z\d]?\d[A-Z]{2}$")
 
 
 @dataclass(frozen=True, slots=True)
+class NearestStation:
+    name: str
+    types: tuple[str, ...]
+    distance: float | None = None
+    unit: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class ListingDraft:
     source: str
     external_id: str
@@ -15,12 +23,25 @@ class ListingDraft:
     asking_price_gbp: int | None = None
     price_qualifier: str | None = None
     bedrooms: int | None = None
+    property_type: str | None = None
+    property_sub_type: str | None = None
     postcode: str | None = None
     floor_area_sqm: float | None = None
     tenure_type: str | None = None
     years_remaining_on_lease: int | None = None
     annual_service_charge_gbp: int | None = None
     annual_ground_rent_gbp: int | None = None
+    key_features: str | None = None
+    description: str | None = None
+    bathrooms: int | None = None
+    garden: str | None = None
+    parking: str | None = None
+    latitude: float | None = None
+    longitude: float | None = None
+    nearest_stations: tuple[NearestStation, ...] | None = None
+    listing_update_reason: str | None = None
+    listing_update_date: str | None = None
+    first_visible_date: str | None = None
 
     def __post_init__(self) -> None:
         for field_name in ("source", "external_id", "url"):
@@ -36,6 +57,8 @@ class ListingDraft:
             object.__setattr__(self, "postcode", None)
         else:
             object.__setattr__(self, "postcode", normalise_postcode(self.postcode))
+        if not self.nearest_stations:
+            object.__setattr__(self, "nearest_stations", None)
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,12 +71,25 @@ class Listing:
     asking_price_gbp: int | None
     price_qualifier: str | None
     bedrooms: int | None
+    property_type: str | None
+    property_sub_type: str | None
     postcode: str | None
     floor_area_sqm: float | None
     tenure_type: str | None
     years_remaining_on_lease: int | None
     annual_service_charge_gbp: int | None
     annual_ground_rent_gbp: int | None
+    key_features: str | None
+    description: str | None
+    bathrooms: int | None
+    garden: str | None
+    parking: str | None
+    latitude: float | None
+    longitude: float | None
+    nearest_stations: tuple[NearestStation, ...] | None
+    listing_update_reason: str | None
+    listing_update_date: str | None
+    first_visible_date: str | None
 
 
 def normalise_postcode(postcode: str) -> str:

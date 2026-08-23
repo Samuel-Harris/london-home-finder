@@ -4,8 +4,18 @@ import json
 import re
 from dataclasses import dataclass
 
+from lhf.listings.listing import NearestStation
 from lhf.scraper.http import RIGHTMOVE_ORIGIN
-from lhf.scraper.json_values import as_dict, as_int, as_list, as_optional_str, as_positive_int
+from lhf.scraper.json_values import (
+    as_coordinates,
+    as_dict,
+    as_int,
+    as_joined_lines,
+    as_list,
+    as_nearest_stations,
+    as_optional_str,
+    as_positive_int,
+)
 
 _NEXT_DATA = re.compile(
     r'<script id="__NEXT_DATA__" type="application/json">\s*(.*?)\s*</script>',
@@ -22,7 +32,18 @@ class SearchCard:
     price_qualifier: str | None = None
     bedrooms: int | None = None
     display_size: str | None = None
+    property_type: str | None = None
+    property_sub_type: str | None = None
     tenure_type: str | None = None
+    key_features: str | None = None
+    description: str | None = None
+    bathrooms: int | None = None
+    latitude: float | None = None
+    longitude: float | None = None
+    nearest_stations: tuple[NearestStation, ...] | None = None
+    listing_update_reason: str | None = None
+    listing_update_date: str | None = None
+    first_visible_date: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -56,6 +77,8 @@ def _search_card(raw: dict[str, object]) -> SearchCard | None:
     qualifier = None
     if display_prices:
         qualifier = as_optional_str(as_dict(display_prices[0]).get("displayPriceQualifier"))
+    latitude, longitude = as_coordinates(raw.get("location"))
+    listing_update = as_dict(raw.get("listingUpdate"))
     return SearchCard(
         listing_id=identifier,
         url=_listing_url(as_optional_str(raw.get("propertyUrl")), identifier),
@@ -64,7 +87,21 @@ def _search_card(raw: dict[str, object]) -> SearchCard | None:
         price_qualifier=qualifier,
         bedrooms=as_int(raw.get("bedrooms")),
         display_size=as_optional_str(raw.get("displaySize")),
+        property_type=as_optional_str(raw.get("propertyType")),
+        property_sub_type=as_optional_str(raw.get("propertySubType")),
         tenure_type=as_optional_str(as_dict(raw.get("tenure")).get("tenureType")),
+        key_features=as_joined_lines(raw.get("keyFeatures")),
+        description=as_optional_str(raw.get("summary")),
+        bathrooms=as_int(raw.get("bathrooms")),
+        latitude=latitude,
+        longitude=longitude,
+        nearest_stations=as_nearest_stations(raw.get("nearestStations")),
+        listing_update_reason=(
+            as_optional_str(raw.get("addedOrReduced"))
+            or as_optional_str(listing_update.get("listingUpdateReason"))
+        ),
+        listing_update_date=as_optional_str(listing_update.get("listingUpdateDate")),
+        first_visible_date=as_optional_str(raw.get("firstVisibleDate")),
     )
 
 

@@ -4,10 +4,15 @@ import json
 from dataclasses import dataclass
 from typing import cast
 
+from lhf.listings.listing import NearestStation
 from lhf.scraper.json_values import (
+    as_coordinates,
     as_dict,
+    as_display_texts,
     as_int,
+    as_joined_lines,
     as_list,
+    as_nearest_stations,
     as_numeric_int,
     as_optional_str,
     as_positive_int,
@@ -21,6 +26,8 @@ class PropertyDetail:
     asking_price_gbp: int | None = None
     price_qualifier: str | None = None
     bedrooms: int | None = None
+    property_type: str | None = None
+    property_sub_type: str | None = None
     outcode: str | None = None
     incode: str | None = None
     floor_area_sqm: float | None = None
@@ -29,6 +36,17 @@ class PropertyDetail:
     years_remaining_on_lease: int | None = None
     annual_service_charge_gbp: int | None = None
     annual_ground_rent_gbp: int | None = None
+    key_features: str | None = None
+    description: str | None = None
+    bathrooms: int | None = None
+    garden: str | None = None
+    parking: str | None = None
+    latitude: float | None = None
+    longitude: float | None = None
+    nearest_stations: tuple[NearestStation, ...] | None = None
+    listing_update_reason: str | None = None
+    listing_update_date: str | None = None
+    first_visible_date: str | None = None
 
 
 def parse_property_data(html: str) -> PropertyDetail:
@@ -52,6 +70,8 @@ def _property_detail(raw: dict[str, object]) -> PropertyDetail:
     address = as_dict(raw.get("address"))
     tenure = as_dict(raw.get("tenure"))
     living_costs = as_dict(raw.get("livingCosts"))
+    features = as_dict(raw.get("features"))
+    latitude, longitude = as_coordinates(raw.get("location"))
     floor_area_sqm, floor_area_sqft = _floor_areas(raw.get("sizings"))
     years = as_int(tenure.get("yearsRemainingOnLease"))
     if years is None:
@@ -61,6 +81,8 @@ def _property_detail(raw: dict[str, object]) -> PropertyDetail:
         asking_price_gbp=as_positive_int(as_dict(raw.get("mortgageCalculator")).get("price")),
         price_qualifier=as_optional_str(as_dict(raw.get("prices")).get("displayPriceQualifier")),
         bedrooms=as_int(raw.get("bedrooms")),
+        property_type=as_optional_str(raw.get("propertyType")),
+        property_sub_type=as_optional_str(raw.get("propertySubType")),
         outcode=as_optional_str(address.get("outcode")),
         incode=as_optional_str(address.get("incode")),
         floor_area_sqm=floor_area_sqm,
@@ -69,6 +91,21 @@ def _property_detail(raw: dict[str, object]) -> PropertyDetail:
         years_remaining_on_lease=years,
         annual_service_charge_gbp=as_numeric_int(living_costs.get("annualServiceCharge")),
         annual_ground_rent_gbp=as_numeric_int(living_costs.get("annualGroundRent")),
+        key_features=as_joined_lines(raw.get("keyFeatures")),
+        description=as_optional_str(as_dict(raw.get("text")).get("description")),
+        bathrooms=as_int(raw.get("bathrooms")),
+        garden=as_display_texts(features.get("garden")),
+        parking=as_display_texts(features.get("parking")),
+        latitude=latitude,
+        longitude=longitude,
+        nearest_stations=as_nearest_stations(raw.get("nearestStations")),
+        listing_update_reason=as_optional_str(
+            as_dict(raw.get("listingHistory")).get("listingUpdateReason")
+        ),
+        listing_update_date=as_optional_str(
+            as_dict(raw.get("listingUpdate")).get("listingUpdateDate")
+        ),
+        first_visible_date=as_optional_str(raw.get("firstVisibleDate")),
     )
 
 

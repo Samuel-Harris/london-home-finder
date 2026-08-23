@@ -25,8 +25,22 @@ def test_recorded_rightmove_html_round_trips_through_migrated_sqlite(tmp_path: P
         ("222222", "SW1A 2AA"),
     ]
     assert listings[0].asking_price_gbp is None
+    assert listings[0].property_type == "flat"
+    assert listings[0].property_sub_type == "Maisonette"
     assert listings[0].annual_service_charge_gbp == 2400
+    assert listings[0].key_features == "Private garden\nLift"
+    assert listings[0].description == "A leasehold maisonette.<br /><br />Private garden."
+    assert listings[0].bathrooms == 1
+    assert listings[0].garden == "Yes"
+    assert listings[0].nearest_stations is not None
+    assert len(listings[0].nearest_stations) == 2
     assert listings[1].years_remaining_on_lease is None
+    assert listings[1].garden == "Private garden"
+    assert listings[1].nearest_stations is not None
+    assert len(listings[1].nearest_stations) == 3
+    assert listings[1].property_type == "house"
+    assert listings[1].property_sub_type == "Terraced"
+    assert listings[1].key_features == "Rear garden\nPeriod features"
 
     replacement = [
         ListingDraft(

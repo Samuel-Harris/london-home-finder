@@ -57,6 +57,17 @@ def test_listing_draft_treats_blank_postcode_as_missing() -> None:
     assert draft.postcode is None
 
 
+def test_listing_draft_treats_empty_stations_as_missing() -> None:
+    draft = ListingDraft(
+        source="rightmove",
+        external_id="poa-1",
+        url="https://www.rightmove.co.uk/properties/1",
+        nearest_stations=(),
+    )
+
+    assert draft.nearest_stations is None
+
+
 def test_listing_draft_rejects_non_positive_lease_years() -> None:
     with pytest.raises(ValueError, match="years_remaining_on_lease"):
         ListingDraft(

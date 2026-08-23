@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from lhf.db.base import Base
-from sqlalchemy import Float, Integer, String, UniqueConstraint
+from sqlalchemy import JSON, Float, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 
@@ -33,6 +33,16 @@ class ListingRow(Base):
         nullable=True,
         comment="Bedroom count",
     )
+    property_type: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+        comment="Rightmove propertyType as stored",
+    )
+    property_sub_type: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+        comment="Rightmove propertySubType as stored",
+    )
     postcode: Mapped[str | None] = mapped_column(
         String(8),
         nullable=True,
@@ -63,4 +73,59 @@ class ListingRow(Base):
         Integer,
         nullable=True,
         comment="Annual ground rent",
+    )
+    key_features: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+        comment="Rightmove keyFeatures joined with newlines",
+    )
+    description: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+        comment="Rightmove text.description as stored",
+    )
+    bathrooms: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+        comment="Bathroom count",
+    )
+    garden: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+        comment="Rightmove features.garden displayText joined with newlines",
+    )
+    parking: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+        comment="Rightmove features.parking displayText joined with newlines",
+    )
+    latitude: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+        comment="Rightmove location.latitude",
+    )
+    longitude: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+        comment="Rightmove location.longitude",
+    )
+    nearest_stations: Mapped[list[dict[str, object]] | None] = mapped_column(
+        JSON,
+        nullable=True,
+        comment="Rightmove nearestStations as stored",
+    )
+    listing_update_reason: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+        comment="Rightmove listingHistory.listingUpdateReason or search addedOrReduced",
+    )
+    listing_update_date: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+        comment="Rightmove listingUpdate.listingUpdateDate as stored",
+    )
+    first_visible_date: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+        comment="Rightmove firstVisibleDate as stored",
     )

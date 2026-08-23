@@ -33,9 +33,26 @@ def test_scrape_maps_recorded_pages_and_deduplicates(
     listings = ListingRepository(create_session_factory(database_path)).list_all()
     assert [listing.external_id for listing in listings] == ["111111", "222222"]
     assert listings[0].asking_price_gbp is None
+    assert listings[0].property_type == "flat"
+    assert listings[0].property_sub_type == "Maisonette"
     assert listings[0].annual_service_charge_gbp == 2400
+    assert listings[0].key_features == "Private garden\nLift"
+    assert listings[0].description == "A leasehold maisonette.<br /><br />Private garden."
+    assert listings[0].bathrooms == 1
+    assert listings[0].garden == "Yes"
+    assert listings[0].parking == "Allocated underground"
+    assert listings[0].longitude == -0.1416
+    assert listings[0].nearest_stations is not None
+    assert [station.name for station in listings[0].nearest_stations] == [
+        "Westminster Station",
+        "Waterloo Station",
+    ]
     assert listings[1].years_remaining_on_lease is None
     assert listings[1].postcode == "SW1A 2AA"
+    assert listings[1].property_type == "house"
+    assert listings[1].property_sub_type == "Terraced"
+    assert listings[1].key_features == "Rear garden\nPeriod features"
+    assert listings[1].description == "A terraced house in Westminster."
 
 
 def test_failed_search_does_not_wipe_existing_rows(

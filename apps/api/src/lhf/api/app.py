@@ -15,6 +15,15 @@ class HealthResponse(BaseModel):
     status: str
 
 
+class NearestStationResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    name: str
+    types: list[str]
+    distance: float | None
+    unit: str | None
+
+
 class ListingResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -26,12 +35,25 @@ class ListingResponse(BaseModel):
     asking_price_gbp: int | None
     price_qualifier: str | None
     bedrooms: int | None
+    property_type: str | None
+    property_sub_type: str | None
     postcode: str | None
     floor_area_sqm: float | None
     tenure_type: str | None
     years_remaining_on_lease: int | None
     annual_service_charge_gbp: int | None
     annual_ground_rent_gbp: int | None
+    key_features: str | None
+    description: str | None
+    bathrooms: int | None
+    garden: str | None
+    parking: str | None
+    latitude: float | None
+    longitude: float | None
+    nearest_stations: list[NearestStationResponse] | None
+    listing_update_reason: str | None
+    listing_update_date: str | None
+    first_visible_date: str | None
 
 
 def create_app(database_path: str | Path | None = None) -> FastAPI:

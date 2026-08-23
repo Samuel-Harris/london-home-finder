@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import pytest
+from lhf.listings.listing import NearestStation
 from lhf.scraper.checkpoint import (
     CHECKPOINT_VERSION,
     ActiveShard,
@@ -36,21 +37,116 @@ def test_round_trip_preserves_null_bedrooms_and_null_detail(tmp_path: Path) -> N
             listing_id="111111",
             url="https://www.rightmove.co.uk/properties/111111",
             bedrooms=None,
+            property_type="flat",
+            property_sub_type="Maisonette",
+            key_features="Private garden\nLift",
+            description="A maisonette somewhere.",
+            bathrooms=9,
+            latitude=51.0,
+            longitude=-0.12,
+            nearest_stations=(
+                NearestStation(
+                    name="Westminster Station",
+                    types=("LONDON_UNDERGROUND", "NATIONAL_TRAIN"),
+                    distance=0.15,
+                    unit="miles",
+                ),
+                NearestStation(
+                    name="St James's Park Station",
+                    types=("LONDON_UNDERGROUND",),
+                    distance=0.4,
+                    unit="miles",
+                ),
+                NearestStation(
+                    name="Waterloo Station",
+                    types=("NATIONAL_TRAIN",),
+                    distance=0.9,
+                    unit="miles",
+                ),
+            ),
+            listing_update_reason="Reduced on 12/05/2026",
+            listing_update_date="2026-05-12T10:00:00Z",
+            first_visible_date="2026-01-15T12:00:00Z",
         )
     ]
     state.details = {
         "111111": None,
-        "222222": PropertyDetail(display_address="10 Downing Street", bedrooms=3),
+        "222222": PropertyDetail(
+            display_address="10 Downing Street",
+            bedrooms=3,
+            garden="Private garden",
+            parking="Allocated underground",
+        ),
     }
     save_checkpoint(path, state)
 
     loaded = load_checkpoint(path)
     assert loaded == state
     assert loaded.cards[0].bedrooms is None
+    assert loaded.cards[0].property_type == "flat"
+    assert loaded.cards[0].property_sub_type == "Maisonette"
+    assert loaded.cards[0].key_features == "Private garden\nLift"
+    assert loaded.cards[0].description == "A maisonette somewhere."
+    assert loaded.cards[0].bathrooms == 9
+    assert loaded.cards[0].longitude == -0.12
+    assert loaded.cards[0].nearest_stations is not None
+    assert len(loaded.cards[0].nearest_stations) == 3
+    assert loaded.cards[0].nearest_stations[0].types == ("LONDON_UNDERGROUND", "NATIONAL_TRAIN")
+    assert loaded.cards[0].listing_update_reason == "Reduced on 12/05/2026"
     assert loaded.details["111111"] is None
     assert loaded.details["222222"] is not None
     assert loaded.details["222222"].display_address == "10 Downing Street"
+    assert loaded.details["222222"].garden == "Private garden"
     assert json.loads(path.read_text(encoding="utf-8"))["search_url_base"] == SEARCH_URL
+
+
+def test_load_treats_missing_screening_fields_as_absent(tmp_path: Path) -> None:
+    path = tmp_path / "db.sqlite3.scrape-checkpoint.json"
+    state = new_checkpoint(300_000, 1_000_000, None)
+    state.cards = [
+        SearchCard(listing_id="111111", url="https://www.rightmove.co.uk/properties/111111")
+    ]
+    state.details = {"111111": PropertyDetail(display_address="10 Downing Street")}
+    save_checkpoint(path, state)
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    for field_name in (
+        "property_type",
+        "property_sub_type",
+        "key_features",
+        "description",
+        "bathrooms",
+        "latitude",
+        "longitude",
+        "nearest_stations",
+        "listing_update_reason",
+        "listing_update_date",
+        "first_visible_date",
+    ):
+        del payload["cards"][0][field_name]
+    for field_name in (
+        "property_type",
+        "property_sub_type",
+        "key_features",
+        "description",
+        "bathrooms",
+        "garden",
+        "parking",
+        "latitude",
+        "longitude",
+        "nearest_stations",
+        "listing_update_reason",
+        "listing_update_date",
+        "first_visible_date",
+    ):
+        del payload["details"]["111111"][field_name]
+    path.write_text(json.dumps(payload), encoding="utf-8")
+
+    loaded = load_checkpoint(path)
+    assert loaded.cards[0].property_type is None
+    assert loaded.cards[0].nearest_stations is None
+    assert loaded.details["111111"] is not None
+    assert loaded.details["111111"].garden is None
+    assert loaded.details["111111"].display_address == "10 Downing Street"
 
 
 def test_save_replaces_into_final_path_and_leaves_it_readable(tmp_path: Path) -> None:

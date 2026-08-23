@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Literal, cast
 
+from lhf.listings.listing import NearestStation
 from lhf.scraper.detail import PropertyDetail
 from lhf.scraper.search import SearchCard
 from lhf.scraper.shards import SEARCH_URL, SearchFilter
@@ -140,7 +141,18 @@ def _search_card(raw: object) -> SearchCard:
         price_qualifier=_optional_str(data["price_qualifier"]),
         bedrooms=_optional_int(data["bedrooms"]),
         display_size=_optional_str(data["display_size"]),
+        property_type=_optional_str(data.get("property_type")),
+        property_sub_type=_optional_str(data.get("property_sub_type")),
         tenure_type=_optional_str(data["tenure_type"]),
+        key_features=_optional_str(data.get("key_features")),
+        description=_optional_str(data.get("description")),
+        bathrooms=_optional_int(data.get("bathrooms")),
+        latitude=_optional_float(data.get("latitude")),
+        longitude=_optional_float(data.get("longitude")),
+        nearest_stations=_nearest_stations(data.get("nearest_stations")),
+        listing_update_reason=_optional_str(data.get("listing_update_reason")),
+        listing_update_date=_optional_str(data.get("listing_update_date")),
+        first_visible_date=_optional_str(data.get("first_visible_date")),
     )
 
 
@@ -153,6 +165,8 @@ def _property_detail(raw: object) -> PropertyDetail | None:
         asking_price_gbp=_optional_int(data["asking_price_gbp"]),
         price_qualifier=_optional_str(data["price_qualifier"]),
         bedrooms=_optional_int(data["bedrooms"]),
+        property_type=_optional_str(data.get("property_type")),
+        property_sub_type=_optional_str(data.get("property_sub_type")),
         outcode=_optional_str(data["outcode"]),
         incode=_optional_str(data["incode"]),
         floor_area_sqm=_optional_float(data["floor_area_sqm"]),
@@ -161,6 +175,36 @@ def _property_detail(raw: object) -> PropertyDetail | None:
         years_remaining_on_lease=_optional_int(data["years_remaining_on_lease"]),
         annual_service_charge_gbp=_optional_int(data["annual_service_charge_gbp"]),
         annual_ground_rent_gbp=_optional_int(data["annual_ground_rent_gbp"]),
+        key_features=_optional_str(data.get("key_features")),
+        description=_optional_str(data.get("description")),
+        bathrooms=_optional_int(data.get("bathrooms")),
+        garden=_optional_str(data.get("garden")),
+        parking=_optional_str(data.get("parking")),
+        latitude=_optional_float(data.get("latitude")),
+        longitude=_optional_float(data.get("longitude")),
+        nearest_stations=_nearest_stations(data.get("nearest_stations")),
+        listing_update_reason=_optional_str(data.get("listing_update_reason")),
+        listing_update_date=_optional_str(data.get("listing_update_date")),
+        first_visible_date=_optional_str(data.get("first_visible_date")),
+    )
+
+
+def _nearest_stations(raw: object) -> tuple[NearestStation, ...] | None:
+    if raw is None:
+        return None
+    items = _array(raw)
+    if not items:
+        return None
+    return tuple(_nearest_station(item) for item in items)
+
+
+def _nearest_station(raw: object) -> NearestStation:
+    data = _object(raw)
+    return NearestStation(
+        name=_str(data["name"]),
+        types=tuple(_str(item) for item in _array(data["types"])),
+        distance=_optional_float(data["distance"]),
+        unit=_optional_str(data["unit"]),
     )
 
 

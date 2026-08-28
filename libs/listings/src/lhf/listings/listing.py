@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from typing import cast
 
 _POSTCODE_PATTERN = re.compile(r"^[A-Z]{1,2}\d[A-Z\d]?\d[A-Z]{2}$")
 
@@ -13,8 +14,47 @@ class NearestStation:
     distance: float | None = None
     unit: str | None = None
 
+    @classmethod
+    def from_stored(cls, raw: object) -> NearestStation:
+        if not isinstance(raw, dict):
+            raise TypeError("nearest_station must be an object")
+        data = cast(dict[object, object], raw)
+        name = data.get("name")
+        types = data.get("types")
+        distance = data.get("distance")
+        unit = data.get("unit")
+        if not isinstance(name, str):
+            raise TypeError("nearest_station name must be a str")
+        if not isinstance(types, list):
+            raise TypeError("nearest_station types must be a list of str")
+        parsed_types: list[str] = []
+        for item in cast(list[object], types):
+            if not isinstance(item, str):
+                raise TypeError("nearest_station types must be a list of str")
+            parsed_types.append(item)
+        if distance is not None and (
+            isinstance(distance, bool) or not isinstance(distance, int | float)
+        ):
+            raise TypeError("nearest_station distance must be a number")
+        if unit is not None and not isinstance(unit, str):
+            raise TypeError("nearest_station unit must be a str")
+        return cls(
+            name=name,
+            types=tuple(parsed_types),
+            distance=None if distance is None else float(distance),
+            unit=unit,
+        )
 
-@dataclass(frozen=True, slots=True)
+
+def nearest_stations_from_stored(
+    raw: list[dict[str, object]] | None,
+) -> tuple[NearestStation, ...] | None:
+    if not raw:
+        return None
+    return tuple(NearestStation.from_stored(item) for item in raw)
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
 class ListingDraft:
     source: str
     external_id: str
@@ -61,35 +101,9 @@ class ListingDraft:
             object.__setattr__(self, "nearest_stations", None)
 
 
-@dataclass(frozen=True, slots=True)
-class Listing:
+@dataclass(frozen=True, slots=True, kw_only=True)
+class Listing(ListingDraft):
     id: int
-    source: str
-    external_id: str
-    url: str
-    display_address: str | None
-    asking_price_gbp: int | None
-    price_qualifier: str | None
-    bedrooms: int | None
-    property_type: str | None
-    property_sub_type: str | None
-    postcode: str | None
-    floor_area_sqm: float | None
-    tenure_type: str | None
-    years_remaining_on_lease: int | None
-    annual_service_charge_gbp: int | None
-    annual_ground_rent_gbp: int | None
-    key_features: str | None
-    description: str | None
-    bathrooms: int | None
-    garden: str | None
-    parking: str | None
-    latitude: float | None
-    longitude: float | None
-    nearest_stations: tuple[NearestStation, ...] | None
-    listing_update_reason: str | None
-    listing_update_date: str | None
-    first_visible_date: str | None
 
 
 def normalise_postcode(postcode: str) -> str:

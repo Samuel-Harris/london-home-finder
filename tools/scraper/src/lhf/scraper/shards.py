@@ -46,8 +46,18 @@ def split_filter(search_filter: SearchFilter) -> tuple[SearchFilter, SearchFilte
 
 
 def search_url(search_filter: SearchFilter, index: int) -> str:
+    parts = [SEARCH_URL, *_filter_query_parts(search_filter)]
+    if index != 0:
+        parts.append(f"index={index}")
+    return "&".join(parts)
+
+
+def filter_label(search_filter: SearchFilter) -> str:
+    return " ".join(_filter_query_parts(search_filter))
+
+
+def _filter_query_parts(search_filter: SearchFilter) -> list[str]:
     parts = [
-        SEARCH_URL,
         f"minPrice={search_filter.min_price}",
         f"maxPrice={search_filter.max_price}",
     ]
@@ -59,6 +69,4 @@ def search_url(search_filter: SearchFilter, index: int) -> str:
         parts.append(f"propertyTypes={','.join(search_filter.property_types)}")
     if search_filter.tenure is not None:
         parts.append(f"tenureTypes={search_filter.tenure}")
-    if index != 0:
-        parts.append(f"index={index}")
-    return "&".join(parts)
+    return parts

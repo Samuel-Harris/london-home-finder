@@ -8,7 +8,6 @@ members = [
     "lhf-db",
     "lhf-db-app",
     "lhf-listings",
-    "lhf-repository",
     "lhf-scraper",
 ]
 
@@ -408,21 +407,14 @@ version = "0.1.0"
 source = { editable = "libs/listings" }
 dependencies = [
     { name = "lhf-db" },
-    { name = "lhf-repository" },
     { name = "sqlalchemy" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "lhf-db", editable = "libs/db" },
-    { name = "lhf-repository", editable = "libs/repository" },
     { name = "sqlalchemy", specifier = "==2.0.51" },
 ]
-
-[[package]]
-name = "lhf-repository"
-version = "0.1.0"
-source = { editable = "libs/repository" }
 
 [[package]]
 name = "lhf-scraper"

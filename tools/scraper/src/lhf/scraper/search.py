@@ -55,17 +55,18 @@ class SearchPage:
 def parse_search_page(html: str) -> SearchPage:
     match = _NEXT_DATA.search(html)
     if match is None:
-        return SearchPage(properties=[], result_count=None)
+        raise ValueError("search page is missing __NEXT_DATA__")
     payload: object = json.loads(match.group(1))
-    search_results = as_dict(_nested(payload, "props", "pageProps", "searchResults"))
+    search_results = _nested(payload, "props", "pageProps", "searchResults")
+    if not isinstance(search_results, dict):
+        raise ValueError("search page is missing searchResults")
+    results = as_dict(search_results)
     cards: list[SearchCard] = []
-    for item in as_list(search_results.get("properties")):
+    for item in as_list(results.get("properties")):
         card = _search_card(as_dict(item))
         if card is not None:
             cards.append(card)
-    return SearchPage(
-        properties=cards, result_count=_result_count(search_results.get("resultCount"))
-    )
+    return SearchPage(properties=cards, result_count=_result_count(results.get("resultCount")))
 
 
 def _search_card(raw: dict[str, object]) -> SearchCard | None:

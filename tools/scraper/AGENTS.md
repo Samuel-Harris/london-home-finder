@@ -10,8 +10,9 @@ Override with `just scrape --min-price N --max-price N --min-bedrooms N`,
 `--property-types csv`, `--tenure FREEHOLD|any`, and optional `--max-pages N`
 (omit for all pages). `just scrape --resume` continues the
 sidecar `{database}.scrape-checkpoint.json` when the window flags match;
-listings are replaced only when a run completes, then the checkpoint is
-deleted. A fresh `just scrape` warns and discards a leftover checkpoint.
+listings are replaced only when a run completes with at least one listing;
+an unusable search page or a completed run with no cards leaves the database
+untouched. A fresh `just scrape` warns and discards a leftover checkpoint.
 Fetch pages with Playwright Chromium (lazy-start on first `get()`). Split
 overflowing `find.html` shards on price, then bedrooms, until each
 `resultCount` is ≤ 1008; union unique listing ids.

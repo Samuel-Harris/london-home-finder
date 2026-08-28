@@ -5,13 +5,11 @@ description = "Listing domain and persistence for London Home Finder"
 requires-python = ">=3.13"
 dependencies = [
     "lhf-db",
-    "lhf-repository",
     "SQLAlchemy==2.0.51",
 ]
 
 [tool.uv.sources]
 lhf-db = { workspace = true }
-lhf-repository = { workspace = true }
 
 [build-system]
 requires = ["hatchling==1.31.0"]

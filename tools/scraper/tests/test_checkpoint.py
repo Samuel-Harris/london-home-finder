@@ -24,7 +24,7 @@ def test_checkpoint_path_appends_suffix(tmp_path: Path) -> None:
 
 def test_round_trip_preserves_null_bedrooms_and_null_detail(tmp_path: Path) -> None:
     path = tmp_path / "db.sqlite3.scrape-checkpoint.json"
-    state = new_checkpoint(300_000, 1_000_000, None)
+    state = new_checkpoint(SearchFilter(min_price=300_000, max_price=1_000_000), None)
     state.pending_filters = [
         SearchFilter(min_price=300_000, max_price=650_000, min_bedrooms=None, max_bedrooms=None)
     ]
@@ -82,6 +82,8 @@ def test_round_trip_preserves_null_bedrooms_and_null_detail(tmp_path: Path) -> N
 
     loaded = load_checkpoint(path)
     assert loaded == state
+    assert loaded.window.min_price == 300_000
+    assert loaded.window.max_price == 1_000_000
     assert loaded.cards[0].bedrooms is None
     assert loaded.cards[0].property_type == "flat"
     assert loaded.cards[0].property_sub_type == "Maisonette"
@@ -100,58 +102,24 @@ def test_round_trip_preserves_null_bedrooms_and_null_detail(tmp_path: Path) -> N
     assert json.loads(path.read_text(encoding="utf-8"))["search_url_base"] == SEARCH_URL
 
 
-def test_load_treats_missing_screening_fields_as_absent(tmp_path: Path) -> None:
+def test_load_rejects_missing_card_fields(tmp_path: Path) -> None:
     path = tmp_path / "db.sqlite3.scrape-checkpoint.json"
-    state = new_checkpoint(300_000, 1_000_000, None)
+    state = new_checkpoint(SearchFilter(min_price=300_000, max_price=1_000_000), None)
     state.cards = [
         SearchCard(listing_id="111111", url="https://www.rightmove.co.uk/properties/111111")
     ]
-    state.details = {"111111": PropertyDetail(display_address="10 Downing Street")}
     save_checkpoint(path, state)
     payload = json.loads(path.read_text(encoding="utf-8"))
-    for field_name in (
-        "property_type",
-        "property_sub_type",
-        "key_features",
-        "description",
-        "bathrooms",
-        "latitude",
-        "longitude",
-        "nearest_stations",
-        "listing_update_reason",
-        "listing_update_date",
-        "first_visible_date",
-    ):
-        del payload["cards"][0][field_name]
-    for field_name in (
-        "property_type",
-        "property_sub_type",
-        "key_features",
-        "description",
-        "bathrooms",
-        "garden",
-        "parking",
-        "latitude",
-        "longitude",
-        "nearest_stations",
-        "listing_update_reason",
-        "listing_update_date",
-        "first_visible_date",
-    ):
-        del payload["details"]["111111"][field_name]
+    del payload["cards"][0]["property_type"]
     path.write_text(json.dumps(payload), encoding="utf-8")
 
-    loaded = load_checkpoint(path)
-    assert loaded.cards[0].property_type is None
-    assert loaded.cards[0].nearest_stations is None
-    assert loaded.details["111111"] is not None
-    assert loaded.details["111111"].garden is None
-    assert loaded.details["111111"].display_address == "10 Downing Street"
+    with pytest.raises(ValueError, match="scrape checkpoint is invalid"):
+        load_checkpoint(path)
 
 
 def test_save_replaces_into_final_path_and_leaves_it_readable(tmp_path: Path) -> None:
     path = tmp_path / "db.sqlite3.scrape-checkpoint.json"
-    state = new_checkpoint(300_000, 1_000_000, 3)
+    state = new_checkpoint(SearchFilter(min_price=300_000, max_price=1_000_000), 3)
     save_checkpoint(path, state)
 
     assert path.is_file()
@@ -183,8 +151,8 @@ def test_load_missing_file_includes_path(tmp_path: Path) -> None:
 
 def test_load_unsupported_version(tmp_path: Path) -> None:
     path = tmp_path / "db.sqlite3.scrape-checkpoint.json"
-    path.write_text(json.dumps({"version": 2}), encoding="utf-8")
-    with pytest.raises(ValueError, match="scrape checkpoint version 2 is not supported"):
+    path.write_text(json.dumps({"version": 1}), encoding="utf-8")
+    with pytest.raises(ValueError, match="scrape checkpoint version 1 is not supported"):
         load_checkpoint(path)
 
 

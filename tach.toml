@@ -3,7 +3,6 @@ source_roots = [
     "apps/db/src",
     "libs/db/src",
     "libs/listings/src",
-    "libs/repository/src",
     "tools/scraper/src",
 ]
 forbid_circular_dependencies = true

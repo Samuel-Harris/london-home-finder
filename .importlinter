@@ -9,7 +9,7 @@ type = layers
 layers =
     lhf.api | lhf.scraper | lhf.db_app
     lhf.listings
-    lhf.db | lhf.repository
+    lhf.db
 
 [importlinter:contract:listings-public-interface]
 name = Listings private modules are only imported inside the listings package

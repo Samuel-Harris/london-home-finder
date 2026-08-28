@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import pytest
 from lhf.listings.listing import NearestStation
 from lhf.scraper.search import parse_search_page
 
@@ -61,11 +62,15 @@ def test_parse_search_page_reads_next_data() -> None:
     assert page.properties[2].description is None
 
 
-def test_parse_search_page_treats_missing_payload_as_empty() -> None:
-    page = parse_search_page("<html>couldn't find properties</html>")
+def test_parse_search_page_rejects_missing_payload() -> None:
+    with pytest.raises(ValueError, match="missing __NEXT_DATA__"):
+        parse_search_page("<html>couldn't find properties</html>")
 
-    assert page.properties == []
-    assert page.result_count is None
+
+def test_parse_search_page_rejects_missing_search_results() -> None:
+    html = '<script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{}}}</script>'
+    with pytest.raises(ValueError, match="missing searchResults"):
+        parse_search_page(html)
 
 
 def test_parse_search_page_reads_comma_formatted_result_count() -> None:

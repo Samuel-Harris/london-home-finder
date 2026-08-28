@@ -22,7 +22,7 @@ def map_listing(search: SearchCard, detail: PropertyDetail | None) -> ListingDra
         external_id=search.listing_id,
         url=search.url,
         display_address=_prefer(data.display_address, search.display_address),
-        asking_price_gbp=_prefer(search.asking_price_gbp, data.asking_price_gbp),
+        asking_price_gbp=_search_asking_price(search, data),
         price_qualifier=_prefer(data.price_qualifier, search.price_qualifier),
         bedrooms=_prefer(data.bedrooms, search.bedrooms),
         property_type=_prefer(data.property_type, search.property_type),
@@ -76,6 +76,10 @@ def _lease_years(detail: PropertyDetail, tenure_type: str | None) -> int | None:
     if years is None or years <= 0:
         return None
     return years
+
+
+def _search_asking_price(search: SearchCard, detail: PropertyDetail) -> int | None:
+    return _prefer(search.asking_price_gbp, detail.asking_price_gbp)
 
 
 def _prefer[T](primary: T | None, fallback: T | None) -> T | None:

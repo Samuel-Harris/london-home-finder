@@ -13,119 +13,34 @@ class ListingRow(Base):
     source: Mapped[str] = mapped_column(String(100))
     external_id: Mapped[str] = mapped_column(String(200))
     url: Mapped[str] = mapped_column(String(2048))
-    display_address: Mapped[str | None] = mapped_column(
-        String(500),
-        nullable=True,
-        comment="Rightmove display address",
-    )
+    display_address: Mapped[str | None] = mapped_column(String(500), nullable=True)
     asking_price_gbp: Mapped[int | None] = mapped_column(
         Integer,
         nullable=True,
         comment="Numeric asking price in GBP; NULL for POA",
     )
-    price_qualifier: Mapped[str | None] = mapped_column(
-        String(100),
-        nullable=True,
-        comment="Qualifier that changes the price's meaning (Guide Price, OIEO, From, …)",
-    )
-    bedrooms: Mapped[int | None] = mapped_column(
-        Integer,
-        nullable=True,
-        comment="Bedroom count",
-    )
-    property_type: Mapped[str | None] = mapped_column(
-        String(50),
-        nullable=True,
-        comment="Rightmove propertyType as stored",
-    )
-    property_sub_type: Mapped[str | None] = mapped_column(
-        String(100),
-        nullable=True,
-        comment="Rightmove propertySubType as stored",
-    )
-    postcode: Mapped[str | None] = mapped_column(
-        String(8),
-        nullable=True,
-        index=True,
-        comment="Normalised UK postcode from detail address.outcode + address.incode",
-    )
-    floor_area_sqm: Mapped[float | None] = mapped_column(
-        Float,
-        nullable=True,
-        comment="Size in square metres",
-    )
-    tenure_type: Mapped[str | None] = mapped_column(
-        String(50),
-        nullable=True,
-        comment="Rightmove tenure.tenureType as stored",
-    )
+    price_qualifier: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    bedrooms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    property_type: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    property_sub_type: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    postcode: Mapped[str | None] = mapped_column(String(8), nullable=True, index=True)
+    floor_area_sqm: Mapped[float | None] = mapped_column(Float, nullable=True)
+    tenure_type: Mapped[str | None] = mapped_column(String(50), nullable=True)
     years_remaining_on_lease: Mapped[int | None] = mapped_column(
         Integer,
         nullable=True,
         comment="Remaining lease years; NULL when not a positive leasehold figure",
     )
-    annual_service_charge_gbp: Mapped[int | None] = mapped_column(
-        Integer,
-        nullable=True,
-        comment="Annual service charge",
-    )
-    annual_ground_rent_gbp: Mapped[int | None] = mapped_column(
-        Integer,
-        nullable=True,
-        comment="Annual ground rent",
-    )
-    key_features: Mapped[str | None] = mapped_column(
-        Text,
-        nullable=True,
-        comment="Rightmove keyFeatures joined with newlines",
-    )
-    description: Mapped[str | None] = mapped_column(
-        Text,
-        nullable=True,
-        comment="Rightmove text.description as stored",
-    )
-    bathrooms: Mapped[int | None] = mapped_column(
-        Integer,
-        nullable=True,
-        comment="Bathroom count",
-    )
-    garden: Mapped[str | None] = mapped_column(
-        Text,
-        nullable=True,
-        comment="Rightmove features.garden displayText joined with newlines",
-    )
-    parking: Mapped[str | None] = mapped_column(
-        Text,
-        nullable=True,
-        comment="Rightmove features.parking displayText joined with newlines",
-    )
-    latitude: Mapped[float | None] = mapped_column(
-        Float,
-        nullable=True,
-        comment="Rightmove location.latitude",
-    )
-    longitude: Mapped[float | None] = mapped_column(
-        Float,
-        nullable=True,
-        comment="Rightmove location.longitude",
-    )
-    nearest_stations: Mapped[list[dict[str, object]] | None] = mapped_column(
-        JSON,
-        nullable=True,
-        comment="Rightmove nearestStations as stored",
-    )
-    listing_update_reason: Mapped[str | None] = mapped_column(
-        Text,
-        nullable=True,
-        comment="Rightmove listingHistory.listingUpdateReason or search addedOrReduced",
-    )
-    listing_update_date: Mapped[str | None] = mapped_column(
-        Text,
-        nullable=True,
-        comment="Rightmove listingUpdate.listingUpdateDate as stored",
-    )
-    first_visible_date: Mapped[str | None] = mapped_column(
-        Text,
-        nullable=True,
-        comment="Rightmove firstVisibleDate as stored",
-    )
+    annual_service_charge_gbp: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    annual_ground_rent_gbp: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    key_features: Mapped[str | None] = mapped_column(Text, nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    bathrooms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    garden: Mapped[str | None] = mapped_column(Text, nullable=True)
+    parking: Mapped[str | None] = mapped_column(Text, nullable=True)
+    latitude: Mapped[float | None] = mapped_column(Float, nullable=True)
+    longitude: Mapped[float | None] = mapped_column(Float, nullable=True)
+    nearest_stations: Mapped[list[dict[str, object]] | None] = mapped_column(JSON, nullable=True)
+    listing_update_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    listing_update_date: Mapped[str | None] = mapped_column(Text, nullable=True)
+    first_visible_date: Mapped[str | None] = mapped_column(Text, nullable=True)

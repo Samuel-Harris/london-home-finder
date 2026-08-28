@@ -8,8 +8,7 @@ change ends with `uv run just check` passing and the root `AGENTS.md` updated.
 ```text
 apps/api ────────────┐
 tools/scraper ───────┼──> libs/listings ──> libs/db
-apps/db (migrations) ┘         │
-                               └──> libs/repository
+apps/db (migrations) ┘
 
 apps/web ──────────> libs/api-client ──generated from──> contracts/openapi.json
 ```
@@ -41,9 +40,8 @@ workspace package contributes one subpackage under the shared `lhf` namespace
 Use `libs/listings` as the Python feature-library sample: public modules own
 concrete types and behaviour, private `_*.py` modules stay package-local, domain
 functions stay pure, and feature-owned ORM models subclass `lhf.db.base.Base`.
-Concrete repositories implement `lhf.repository.protocol.Repository` (for example
-`ListingRepository`). Use `libs/db` as the shared instrumentation sample (`base`,
-`session`) and `libs/repository` for the shared persistence protocol.
+`ListingRepository` is a concrete class in `libs/listings`. Use `libs/db` as the
+shared instrumentation sample (`base`, `session`).
 
 ## Splitting a module
 

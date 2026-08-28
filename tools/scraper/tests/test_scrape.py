@@ -19,7 +19,12 @@ from lhf.scraper.scrape import scrape
 from lhf.scraper.shards import SearchFilter
 
 FIXTURES = Path(__file__).parent / "fixtures"
-EMPTY_SEARCH = "<html>couldn't find properties</html>"
+EMPTY_SEARCH = (
+    '<script id="__NEXT_DATA__" type="application/json">'
+    '{"props":{"pageProps":{"searchResults":{"resultCount":0,"properties":[]}}}}'
+    "</script>"
+)
+UNUSABLE_SEARCH = "<html>couldn't find properties</html>"
 
 
 def test_scrape_maps_recorded_pages_and_deduplicates(
@@ -77,6 +82,61 @@ def test_failed_search_does_not_wipe_existing_rows(
     monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", fail)
 
     with pytest.raises(FetchError, match="timeout"):
+        scrape(database_path)
+
+    assert [listing.external_id for listing in repository.list_all()] == ["kept"]
+
+
+def test_unusable_search_html_does_not_wipe_existing_rows(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    database_path = tmp_path / "scrape.sqlite3"
+    upgrade_database(database_path)
+    repository = ListingRepository(create_session_factory(database_path))
+    repository.replace_all(
+        [
+            ListingDraft(
+                source="rightmove",
+                external_id="kept",
+                url="https://www.rightmove.co.uk/properties/kept",
+            )
+        ]
+    )
+
+    def unusable(_self: object, url: str) -> str:
+        return UNUSABLE_SEARCH
+
+    monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", unusable)
+
+    with pytest.raises(FetchError, match="missing __NEXT_DATA__"):
+        scrape(database_path)
+
+    assert [listing.external_id for listing in repository.list_all()] == ["kept"]
+    assert checkpoint_path(database_path).is_file()
+
+
+def test_empty_search_results_do_not_wipe_existing_rows(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    database_path = tmp_path / "scrape.sqlite3"
+    upgrade_database(database_path)
+    repository = ListingRepository(create_session_factory(database_path))
+    repository.replace_all(
+        [
+            ListingDraft(
+                source="rightmove",
+                external_id="kept",
+                url="https://www.rightmove.co.uk/properties/kept",
+            )
+        ]
+    )
+
+    def empty(_self: object, url: str) -> str:
+        return EMPTY_SEARCH
+
+    monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", empty)
+
+    with pytest.raises(ValueError, match="scrape produced no listings"):
         scrape(database_path)
 
     assert [listing.external_id for listing in repository.list_all()] == ["kept"]
@@ -392,7 +452,9 @@ def test_resume_window_mismatch_does_not_fetch_and_keeps_file(
 ) -> None:
     database_path = tmp_path / "scrape.sqlite3"
     path = checkpoint_path(database_path)
-    save_checkpoint(path, new_checkpoint(400_000, 1_000_000, None))
+    save_checkpoint(
+        path, new_checkpoint(SearchFilter(min_price=400_000, max_price=1_000_000), None)
+    )
 
     def fail(_self: object, url: str) -> str:
         raise FetchError(f"should not fetch {url}")
@@ -414,7 +476,7 @@ def test_fresh_scrape_discards_leftover_checkpoint_and_fetches_root(
 ) -> None:
     database_path = tmp_path / "scrape.sqlite3"
     upgrade_database(database_path)
-    leftover = new_checkpoint(350_000, 800_000, None)
+    leftover = new_checkpoint(SearchFilter(min_price=350_000, max_price=800_000), None)
     leftover.active = ActiveShard(
         filter=SearchFilter(min_price=500_000, max_price=500_000, min_bedrooms=2, max_bedrooms=4),
         next_index=48,

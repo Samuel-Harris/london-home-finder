@@ -2,7 +2,7 @@
 package = false
 
 [tool.uv.workspace]
-members = ["apps/api", "apps/db", "libs/db", "libs/listings", "libs/repository", "tools/scraper"]
+members = ["apps/api", "apps/db", "libs/db", "libs/listings", "tools/scraper"]
 
 [dependency-groups]
 dev = [
@@ -23,7 +23,6 @@ testpaths = [
     "apps/db/tests",
     "libs/db/tests",
     "libs/listings/tests",
-    "libs/repository/tests",
     "tools/scraper/tests",
     "tests/integration",
 ]
@@ -45,8 +44,6 @@ include = [
     "libs/db/tests",
     "libs/listings/src",
     "libs/listings/tests",
-    "libs/repository/src",
-    "libs/repository/tests",
     "tools/scraper/src",
     "tools/scraper/tests",
     "tests/integration",

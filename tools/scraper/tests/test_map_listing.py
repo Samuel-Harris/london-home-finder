@@ -97,6 +97,19 @@ def test_map_listing_without_detail_uses_search_card() -> None:
     assert len(draft.nearest_stations) == 3
 
 
+def test_map_listing_prefers_search_asking_price() -> None:
+    draft = map_listing(
+        SearchCard(
+            listing_id="1",
+            url="https://www.rightmove.co.uk/properties/1",
+            asking_price_gbp=650_000,
+        ),
+        PropertyDetail(asking_price_gbp=700_000),
+    )
+
+    assert draft.asking_price_gbp == 650_000
+
+
 def test_map_listing_prefers_detail_narrative_over_search() -> None:
     draft = map_listing(
         SearchCard(

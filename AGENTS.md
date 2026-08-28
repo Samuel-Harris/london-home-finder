@@ -6,9 +6,7 @@
 - `apps/db` — sole Alembic history and migrate CLI composition root.
 - `apps/web` — deployable Next.js frontend; may import `libs/api-client` only.
 - `libs/db` — shared SQLAlchemy Base, metadata, and SQLite session factory.
-- `libs/repository` — shared `Repository` protocol for replace_all/list persistence.
-- `libs/listings` — listing domain, ORM models, and repository; imports `libs/db`
-  and `libs/repository`.
+- `libs/listings` — listing domain, ORM models, and repository; imports `libs/db`.
 - `libs/api-client` — generated OpenAPI client plus its small handwritten wrapper.
 - `tools/scraper` — manually invoked Rightmove HTML ingest CLI (adaptive
   `find.html` price shards, default £350k–£800k 2+ bed freehold houses, opt-in `--resume` sidecar

@@ -19,37 +19,135 @@ export type HealthResponse = {
  */
 export type ListingResponse = {
     /**
+     * Annual Ground Rent Gbp
+     */
+    annual_ground_rent_gbp: number | null;
+    /**
+     * Annual Service Charge Gbp
+     */
+    annual_service_charge_gbp: number | null;
+    /**
      * Asking Price Gbp
      */
-    asking_price_gbp: number;
+    asking_price_gbp: number | null;
+    /**
+     * Bathrooms
+     */
+    bathrooms: number | null;
+    /**
+     * Bedrooms
+     */
+    bedrooms: number | null;
+    /**
+     * Description
+     */
+    description: string | null;
+    /**
+     * Display Address
+     */
+    display_address: string | null;
     /**
      * External Id
      */
     external_id: string;
     /**
+     * First Visible Date
+     */
+    first_visible_date: string | null;
+    /**
      * Floor Area Sqm
      */
     floor_area_sqm: number | null;
+    /**
+     * Garden
+     */
+    garden: string | null;
     /**
      * Id
      */
     id: number;
     /**
+     * Key Features
+     */
+    key_features: string | null;
+    /**
+     * Latitude
+     */
+    latitude: number | null;
+    /**
+     * Listing Update Date
+     */
+    listing_update_date: string | null;
+    /**
+     * Listing Update Reason
+     */
+    listing_update_reason: string | null;
+    /**
+     * Longitude
+     */
+    longitude: number | null;
+    /**
+     * Nearest Stations
+     */
+    nearest_stations: Array<NearestStationResponse> | null;
+    /**
+     * Parking
+     */
+    parking: string | null;
+    /**
      * Postcode
      */
-    postcode: string;
+    postcode: string | null;
+    /**
+     * Price Qualifier
+     */
+    price_qualifier: string | null;
+    /**
+     * Property Sub Type
+     */
+    property_sub_type: string | null;
+    /**
+     * Property Type
+     */
+    property_type: string | null;
     /**
      * Source
      */
     source: string;
     /**
-     * Title
+     * Tenure Type
      */
-    title: string;
+    tenure_type: string | null;
     /**
      * Url
      */
     url: string;
+    /**
+     * Years Remaining On Lease
+     */
+    years_remaining_on_lease: number | null;
+};
+
+/**
+ * NearestStationResponse
+ */
+export type NearestStationResponse = {
+    /**
+     * Distance
+     */
+    distance: number | null;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Types
+     */
+    types: Array<string>;
+    /**
+     * Unit
+     */
+    unit: string | null;
 };
 
 export type HealthData = {

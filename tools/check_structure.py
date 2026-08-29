@@ -135,26 +135,53 @@ def main() -> None:
             f"configured={sorted(tach_source_roots)}, expected={sorted(expected_source_roots)}"
         )
 
-    python_import_roots: set[str] = set()
-    for package_path in python_packages:
+    namespaces: set[str] = set()
+    python_import_modules: set[str] = set()
+    package_import_modules: dict[str, str] = {}
+    for package_path in sorted(python_packages):
         source_path = ROOT / package_path / "src"
-        import_roots = {
-            path.name
+        top_dirs = sorted(
+            path
             for path in source_path.iterdir()
-            if path.is_dir() and (path / "__init__.py").is_file()
-        }
-        if len(import_roots) != 1:
+            if path.is_dir() and not path.name.startswith((".", "__"))
+        )
+        if len(top_dirs) != 1:
             errors.append(
-                f"{package_path}/src must contain exactly one import package; "
-                f"found {sorted(import_roots)}"
+                f"{package_path}/src must contain exactly one namespace directory; "
+                f"found {[path.name for path in top_dirs]}"
             )
-        python_import_roots.update(import_roots)
+            continue
+        namespace_dir = top_dirs[0]
+        if (namespace_dir / "__init__.py").is_file():
+            errors.append(
+                f"{package_path}/src/{namespace_dir.name} must be a PEP 420 namespace "
+                "(no __init__.py)"
+            )
+            continue
+        subpackages = sorted(
+            path
+            for path in namespace_dir.iterdir()
+            if path.is_dir()
+            and (path / "__init__.py").is_file()
+            and not path.name.startswith((".", "__"))
+        )
+        if len(subpackages) != 1:
+            errors.append(
+                f"{package_path}/src/{namespace_dir.name} must contain exactly one "
+                f"import package; found {[path.name for path in subpackages]}"
+            )
+            continue
+        import_module = f"{namespace_dir.name}.{subpackages[0].name}"
+        namespaces.add(namespace_dir.name)
+        python_import_modules.add(import_module)
+        package_import_modules[package_path] = import_module
+
     import_linter = _import_linter_config()
     configured_import_roots = set(import_linter["importlinter"].get("root_packages", "").split())
-    if configured_import_roots != python_import_roots:
+    if namespaces and configured_import_roots != namespaces:
         errors.append(
-            "Import Linter roots do not match Python import packages: "
-            f"configured={sorted(configured_import_roots)}, found={sorted(python_import_roots)}"
+            "Import Linter roots do not match Python namespaces: "
+            f"configured={sorted(configured_import_roots)}, found={sorted(namespaces)}"
         )
 
     layer_modules = set(
@@ -163,29 +190,57 @@ def main() -> None:
             import_linter["importlinter:contract:package-layers"].get("layers", ""),
         )
     )
-    if layer_modules != configured_import_roots:
+    if layer_modules != python_import_modules:
         errors.append(
-            "Import Linter package layers do not cover every root package: "
-            f"layers={sorted(layer_modules)}, roots={sorted(configured_import_roots)}"
+            "Import Linter package layers do not cover every owned import module: "
+            f"layers={sorted(layer_modules)}, modules={sorted(python_import_modules)}"
         )
 
-    backend_package = ROOT / "libs/backend/src/lhf_backend"
-    if backend_package.is_dir():
-        private_backend_modules = {
-            f"lhf_backend.{path.stem}"
-            for path in backend_package.glob("_*.py")
+    protected_contracts = [
+        section
+        for section in import_linter.sections()
+        if section.startswith("importlinter:contract:")
+        and import_linter[section].get("type") == "protected"
+    ]
+    for package_path, import_module in sorted(package_import_modules.items()):
+        package_src = ROOT / package_path / "src" / Path(*import_module.split("."))
+        private_modules = {
+            f"{import_module}.{path.stem}"
+            for path in package_src.glob("_*.py")
             if path.name != "__init__.py"
         }
-        protected_backend_modules = set(
-            import_linter["importlinter:contract:backend-public-interface"]
-            .get("protected_modules", "")
-            .split()
-        )
-        if protected_backend_modules != private_backend_modules:
+        if not private_modules:
+            continue
+        matching_contracts = [
+            section
+            for section in protected_contracts
+            if {
+                module
+                for module in import_linter[section].get("protected_modules", "").split()
+                if module
+            }
+            and all(
+                module == import_module or module.startswith(f"{import_module}.")
+                for module in import_linter[section].get("protected_modules", "").split()
+                if module
+            )
+        ]
+        if len(matching_contracts) != 1:
             errors.append(
-                "Import Linter protection does not match backend private modules: "
-                f"protected={sorted(protected_backend_modules)}, "
-                f"private={sorted(private_backend_modules)}"
+                f"Import Linter must have exactly one protected contract for {import_module}: "
+                f"found {matching_contracts}"
+            )
+            continue
+        protected_modules = {
+            module
+            for module in import_linter[matching_contracts[0]].get("protected_modules", "").split()
+            if module
+        }
+        if protected_modules != private_modules:
+            errors.append(
+                "Import Linter protection does not match private modules: "
+                f"package={package_path}, protected={sorted(protected_modules)}, "
+                f"private={sorted(private_modules)}"
             )
 
     root_package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))

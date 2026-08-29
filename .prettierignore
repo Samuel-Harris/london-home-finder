@@ -9,3 +9,4 @@ libs/api-client/src/generated/
 node_modules/
 pnpm-lock.yaml
 uv.lock
+tools/scraper/tests/fixtures/

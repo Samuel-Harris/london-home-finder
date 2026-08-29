@@ -16,13 +16,97 @@
       },
       "ListingResponse": {
         "properties": {
+          "annual_ground_rent_gbp": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Annual Ground Rent Gbp"
+          },
+          "annual_service_charge_gbp": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Annual Service Charge Gbp"
+          },
           "asking_price_gbp": {
-            "title": "Asking Price Gbp",
-            "type": "integer"
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asking Price Gbp"
+          },
+          "bathrooms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bathrooms"
+          },
+          "bedrooms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bedrooms"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "display_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Address"
           },
           "external_id": {
             "title": "External Id",
             "type": "string"
+          },
+          "first_visible_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Visible Date"
           },
           "floor_area_sqm": {
             "anyOf": [
@@ -35,38 +119,251 @@
             ],
             "title": "Floor Area Sqm"
           },
+          "garden": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Garden"
+          },
           "id": {
             "title": "Id",
             "type": "integer"
           },
+          "key_features": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Key Features"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "listing_update_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Listing Update Date"
+          },
+          "listing_update_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Listing Update Reason"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "nearest_stations": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/NearestStationResponse"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nearest Stations"
+          },
+          "parking": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parking"
+          },
           "postcode": {
-            "title": "Postcode",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Postcode"
+          },
+          "price_qualifier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Qualifier"
+          },
+          "property_sub_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Property Sub Type"
+          },
+          "property_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Property Type"
           },
           "source": {
             "title": "Source",
             "type": "string"
           },
-          "title": {
-            "title": "Title",
-            "type": "string"
+          "tenure_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tenure Type"
           },
           "url": {
             "title": "Url",
             "type": "string"
+          },
+          "years_remaining_on_lease": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Years Remaining On Lease"
           }
         },
         "required": [
           "id",
           "source",
           "external_id",
-          "title",
-          "asking_price_gbp",
-          "postcode",
           "url",
-          "floor_area_sqm"
+          "display_address",
+          "asking_price_gbp",
+          "price_qualifier",
+          "bedrooms",
+          "property_type",
+          "property_sub_type",
+          "postcode",
+          "floor_area_sqm",
+          "tenure_type",
+          "years_remaining_on_lease",
+          "annual_service_charge_gbp",
+          "annual_ground_rent_gbp",
+          "key_features",
+          "description",
+          "bathrooms",
+          "garden",
+          "parking",
+          "latitude",
+          "longitude",
+          "nearest_stations",
+          "listing_update_reason",
+          "listing_update_date",
+          "first_visible_date"
         ],
         "title": "ListingResponse",
+        "type": "object"
+      },
+      "NearestStationResponse": {
+        "properties": {
+          "distance": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "types": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Types",
+            "type": "array"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          }
+        },
+        "required": [
+          "name",
+          "types",
+          "distance",
+          "unit"
+        ],
+        "title": "NearestStationResponse",
         "type": "object"
       }
     }

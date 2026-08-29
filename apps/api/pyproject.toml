@@ -4,23 +4,23 @@ version = "0.1.0"
 description = "FastAPI application for London Home Finder"
 requires-python = ">=3.13"
 dependencies = [
-    "alembic==1.18.5",
     "fastapi==0.139.0",
-    "lhf-backend",
+    "lhf-db",
+    "lhf-listings",
     "pydantic==2.13.4",
-    "SQLAlchemy==2.0.51",
     "uvicorn==0.51.0",
 ]
 
 [project.scripts]
-lhf-api = "lhf_api.cli:main"
+lhf-api = "lhf.api.cli:main"
 
 [tool.uv.sources]
-lhf-backend = { workspace = true }
+lhf-db = { workspace = true }
+lhf-listings = { workspace = true }
 
 [build-system]
 requires = ["hatchling==1.31.0"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/lhf_api"]
+packages = ["src/lhf"]

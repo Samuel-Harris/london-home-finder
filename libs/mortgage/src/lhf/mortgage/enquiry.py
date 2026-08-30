@@ -274,9 +274,7 @@ def _densify(
     return best
 
 
-def _rows_including(
-    rows: tuple[PricePoint, ...], extra: PricePoint
-) -> tuple[PricePoint, ...]:
+def _rows_including(rows: tuple[PricePoint, ...], extra: PricePoint) -> tuple[PricePoint, ...]:
     if any(row.price == extra.price for row in rows):
         return rows
     return tuple(sorted((*rows, extra), key=lambda row: row.price))

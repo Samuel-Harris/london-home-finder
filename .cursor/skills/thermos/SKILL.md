@@ -36,8 +36,8 @@ Include contents of untracked files in the packet.
 2. Gather the packet above unless the caller already passed one.
 3. Launch both subagents in the same message with `run_in_background: true`:
    - `subagent_type: "thermo-nuclear-review-subagent"` for bugs, breakages, security, devex regressions, feature-flag leaks, and other branch-audit risks.
-   - `subagent_type: "thermo-nuclear-code-quality-review-subagent"` for maintainability, structure, file-size growth, spaghetti, abstractions, and codebase-health risks.
-4. Pass each subagent the same scoped packet (and any plan or verification evidence the caller supplied) and ask it to return prioritised findings with file references and evidence.
+   - `subagent_type: "thermo-nuclear-code-quality-review"` (cursor-team-kit) for maintainability, structure, file-size growth, spaghetti, abstractions, and codebase-health risks. Do not use a local code-quality skill or subagent.
+4. Pass each subagent the same scoped packet as a user prompt with `### Git / diff output` and `### Changed file contents` (plus any plan or verification evidence the caller supplied) and ask it to return prioritised findings with file references and evidence.
 5. After both finish, synthesise the results with findings first, deduplicated across reviewers. Weight overlapping findings more heavily, resolve disagreements with your own judgement, and keep summaries brief.
 
 If individual background summaries are already visible to the user, do not restate them wholesale. Surface the unified verdict, the highest-signal findings, and any remaining uncertainty.

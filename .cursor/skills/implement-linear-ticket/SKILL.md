@@ -1,13 +1,13 @@
 ---
 name: implement-linear-ticket
-description: Take a Linear ticket to a merge-ready draft GitHub pull request: resolve the issue, branch from origin/$BASE, plan, implement, run thermos, open a draft PR, then babysit until merge-ready. Use when the user asks to implement a Linear ticket, take a ticket to a PR, or run the Linear-to-draft-PR workflow.
+description: Take a Linear ticket to a merge-ready draft GitHub pull request: resolve the issue, branch from origin/$BASE, plan, implement, run thermos, open a draft PR, then drive pstack Babysit until merge-ready. Use when the user asks to implement a Linear ticket, take a ticket to a PR, or run the Linear-to-draft-PR workflow.
 ---
 
 # Implement Linear Ticket
 
 ## Purpose
 
-Use this skill when the user asks you to take a Linear ticket all the way to a merge-ready implementation on a **draft** GitHub pull request. The workflow is intentionally end-to-end: resolve the ticket, create the Linear branch from `origin/$BASE`, plan the implementation, implement it, run `thermos`, refactor from that feedback, then commit, push, and open a draft PR, then load `babysit` until the PR is mergeable, comments are triaged, and CI/CD passes. Leave the GitHub PR as a draft unless the user explicitly asks to mark it ready for review.
+Use this skill when the user asks you to take a Linear ticket all the way to a merge-ready implementation on a **draft** GitHub pull request. The workflow is intentionally end-to-end: resolve the ticket, create the Linear branch from `origin/$BASE`, plan the implementation, implement it, run `thermos`, refactor from that feedback, then commit, push, and open a draft PR, then follow the pstack **Babysit** playbook in `drive` mode until the PR is mergeable, comments are triaged, and CI/CD passes. Leave the GitHub PR as a draft unless the user explicitly asks to mark it ready for review.
 
 ## Required Input
 
@@ -118,7 +118,15 @@ The target base `$BASE` is `main`. Use `$BASE` for branch creation, the thermos 
 
 8. **Babysit the PR until merge-ready**
 
-   Load and follow the `babysit` skill for the newly created PR, passing its number or URL. That skill owns the merge-conflict, comment, and CI loop. Do not declare completion while checks are pending or failing. Do not mark the draft ready, enable auto-merge, or merge. If permissions, an external service, an incompatible conflict, or an out-of-scope failure prevents a merge-ready result, stop and report the exact blocker and failed check or unresolved thread.
+   Start this phase only after the draft PR exists. Do not interleave it with implementation.
+
+   Load the pstack `poteto-mode` skill and follow its **Babysit** playbook (`playbooks/babysit.md`) in `drive` mode for this single PR. Declare `drive` in the first line of this phase before any poll. Pass the new PR number or URL.
+
+   Do not use Cursor's built-in babysit or autopilot skills, or cursor-team-kit `loop-on-ci` / `fix-ci`, as the primary loop.
+
+   This workflow is one Linear-ticket PR, not a Graphite stack. Do not enter the pstack Shipping playbook. Do not follow pstack Opening a PR: no worktrees, no amend, no Conventional Commits, no force-push. Stop at merge-ready (`READY`). Leave the GitHub PR as a draft. Do not mark it ready, enable auto-merge, or merge unless the user explicitly asks.
+
+   If permissions, an external service, a conflict with `$BASE`, or an out-of-scope failure prevents a merge-ready result, stop and report the exact blocker and failed check or unresolved thread.
 
 ## Stop Conditions
 

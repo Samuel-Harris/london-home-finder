@@ -17,7 +17,7 @@ Do not rely on AGENTS.md to hold structure. It points to executable checks and t
 5. Keep the root file to the repository map, global conventions, and commands. Add one short file per top-level package. Split files near 150–200 lines.
 6. Point to `just boundaries` and `just check` rather than duplicating their flags and rules.
 
-Use AGENTS.md as the shared source of truth for behavioral guidance. Codex `.codex/rules/*.rules` files govern command-execution policy, not coding instructions; do not duplicate AGENTS.md content there.
+Use AGENTS.md as the shared source of truth for behavioral guidance.
 
 ## Root template
 

@@ -63,5 +63,8 @@ dev-api: migrate
 dev-web:
     pnpm --filter @lhf/web dev
 
+mortgage *args:
+    uv run lhf-mortgage {{ args }}
+
 precommit:
     uv run pre-commit run --all-files

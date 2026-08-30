@@ -8,6 +8,8 @@ members = [
     "lhf-db",
     "lhf-db-app",
     "lhf-listings",
+    "lhf-mortgage",
+    "lhf-mortgage-cli",
     "lhf-scraper",
 ]
 
@@ -414,6 +416,26 @@ dependencies = [
 requires-dist = [
     { name = "lhf-db", editable = "libs/db" },
     { name = "sqlalchemy", specifier = "==2.0.51" },
+]
+
+[[package]]
+name = "lhf-mortgage"
+version = "0.1.0"
+source = { editable = "libs/mortgage" }
+
+[[package]]
+name = "lhf-mortgage-cli"
+version = "0.1.0"
+source = { editable = "tools/mortgage" }
+dependencies = [
+    { name = "lhf-mortgage" },
+    { name = "rich" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "lhf-mortgage", editable = "libs/mortgage" },
+    { name = "rich", specifier = "==15.0.0" },
 ]
 
 [[package]]

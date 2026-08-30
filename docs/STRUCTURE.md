@@ -10,10 +10,12 @@ apps/api ────────────┐
 tools/scraper ───────┼──> libs/listings ──> libs/db
 apps/db (migrations) ┘
 
+tools/mortgage ─────────> libs/mortgage
+
 apps/web ──────────> libs/api-client ──generated from──> contracts/openapi.json
 ```
 
-`apps/api`, `apps/db`, and `tools/scraper` are independent siblings. Python
+`apps/api`, `apps/db`, `tools/scraper`, and `tools/mortgage` are independent siblings. Python
 cross-package dependencies must be both permitted by Import Linter and declared
 in the importer's `pyproject.toml`. TypeScript dependencies must be permitted by
 dependency-cruiser and declared in the importer's `package.json`.

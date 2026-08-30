@@ -2,7 +2,15 @@
 package = false
 
 [tool.uv.workspace]
-members = ["apps/api", "apps/db", "libs/db", "libs/listings", "tools/scraper"]
+members = [
+    "apps/api",
+    "apps/db",
+    "libs/db",
+    "libs/listings",
+    "libs/mortgage",
+    "tools/mortgage",
+    "tools/scraper",
+]
 
 [dependency-groups]
 dev = [
@@ -23,6 +31,8 @@ testpaths = [
     "apps/db/tests",
     "libs/db/tests",
     "libs/listings/tests",
+    "libs/mortgage/tests",
+    "tools/mortgage/tests",
     "tools/scraper/tests",
     "tests/integration",
 ]
@@ -44,6 +54,10 @@ include = [
     "libs/db/tests",
     "libs/listings/src",
     "libs/listings/tests",
+    "libs/mortgage/src",
+    "libs/mortgage/tests",
+    "tools/mortgage/src",
+    "tools/mortgage/tests",
     "tools/scraper/src",
     "tools/scraper/tests",
     "tests/integration",

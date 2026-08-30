@@ -53,9 +53,9 @@ migrate database_path="data/london-home-finder.sqlite3":
 [arg("tenure", long="tenure")]
 [arg("max_pages", long="max-pages")]
 [arg("resume", long="resume", value="true")]
-scrape database_path="data/london-home-finder.sqlite3" min_price="350000" max_price="800000" min_bedrooms="2" property_types="detached,semi-detached,terraced,bungalow" tenure="FREEHOLD" max_pages="" resume="":
+scrape database_path="data/london-home-finder.sqlite3" min_price="" max_price="" min_bedrooms="" property_types="" tenure="" max_pages="" resume="":
     uv run python -m lhf.db_app.migrations "{{database_path}}"
-    uv run lhf-scrape --database "{{database_path}}" --min-price "{{min_price}}" --max-price "{{max_price}}" --min-bedrooms "{{min_bedrooms}}" --property-types "{{property_types}}" --tenure "{{tenure}}" {{ if max_pages != "" { "--max-pages " + max_pages } else { "" } }} {{ if resume != "" { "--resume" } else { "" } }}
+    uv run lhf-scrape --database "{{database_path}}" {{ if min_price != "" { "--min-price " + min_price } else { "" } }} {{ if max_price != "" { "--max-price " + max_price } else { "" } }} {{ if min_bedrooms != "" { "--min-bedrooms " + min_bedrooms } else { "" } }} {{ if property_types != "" { "--property-types " + property_types } else { "" } }} {{ if tenure != "" { "--tenure " + tenure } else { "" } }} {{ if max_pages != "" { "--max-pages " + max_pages } else { "" } }} {{ if resume != "" { "--resume" } else { "" } }}
 
 dev-api: migrate
     uv run uvicorn lhf.api.app:app --reload

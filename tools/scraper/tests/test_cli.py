@@ -4,13 +4,7 @@ from pathlib import Path
 
 import pytest
 from lhf.scraper.cli import main
-from lhf.scraper.scrape import (
-    DEFAULT_MAX_PRICE,
-    DEFAULT_MIN_BEDROOMS,
-    DEFAULT_MIN_PRICE,
-    DEFAULT_PROPERTY_TYPES,
-    DEFAULT_TENURE,
-)
+from lhf.scraper.window import DEFAULT_WINDOW, IngestWindow
 
 
 def test_cli_defaults_pass_the_default_search_window(
@@ -27,11 +21,7 @@ def test_cli_defaults_pass_the_default_search_window(
     database = tmp_path / "listings.sqlite3"
     assert main(["--database", str(database)]) == 0
     assert captured["database"] == database
-    assert captured["min_price"] == DEFAULT_MIN_PRICE
-    assert captured["max_price"] == DEFAULT_MAX_PRICE
-    assert captured["min_bedrooms"] == DEFAULT_MIN_BEDROOMS
-    assert captured["property_types"] == DEFAULT_PROPERTY_TYPES
-    assert captured["tenure"] == DEFAULT_TENURE
+    assert captured["window"] == DEFAULT_WINDOW
     assert captured["resume"] is False
 
 
@@ -58,6 +48,21 @@ def test_cli_any_omits_optional_filters(tmp_path: Path, monkeypatch: pytest.Monk
         )
         == 0
     )
-    assert captured["min_bedrooms"] is None
-    assert captured["property_types"] is None
-    assert captured["tenure"] is None
+    assert captured["window"] == IngestWindow(
+        min_bedrooms=None,
+        property_types=None,
+        tenure=None,
+    )
+
+
+def test_cli_rejects_negative_min_bedrooms(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def fail(*_args: object, **_kwargs: object) -> int:
+        raise AssertionError("scrape should not run")
+
+    monkeypatch.setattr("lhf.scraper.cli.scrape", fail)
+    with pytest.raises(SystemExit) as caught:
+        main(["--database", str(tmp_path / "listings.sqlite3"), "--min-bedrooms", "-1"])
+    assert caught.value.code == 2
+    assert "min_bedrooms" in capsys.readouterr().err

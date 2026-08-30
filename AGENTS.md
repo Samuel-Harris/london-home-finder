@@ -8,9 +8,10 @@
 - `libs/db` — shared SQLAlchemy Base, metadata, and SQLite session factory.
 - `libs/listings` — listing domain, ORM models, and repository; imports `libs/db`.
 - `libs/api-client` — generated OpenAPI client plus its small handwritten wrapper.
-- `tools/scraper` — manually invoked Rightmove HTML ingest CLI (adaptive
-  `find.html` price shards, default £350k–£800k 2+ bed freehold houses, opt-in `--resume` sidecar
-  checkpoint); may import `libs/listings` and `libs/db`.
+- `tools/scraper` — manually invoked listing ingest CLI. Product window in
+  `lhf.scraper.window`; Rightmove HTML ingest in `lhf.scraper.rightmove`
+  (adaptive `find.html` price shards, default £350k–£800k 2+ bed freehold houses,
+  opt-in `--resume` sidecar checkpoint); may import `libs/listings` and `libs/db`.
 - `contracts` — generated OpenAPI contract. Do not edit it by hand.
 
 ## Commands

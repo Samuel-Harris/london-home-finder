@@ -226,7 +226,7 @@ def cmd_seed_listing(_arguments: argparse.Namespace) -> int:
                 postcode="E8 1AB",
                 tenure_type="FREEHOLD",
             )
-        ]
+        ],
     )
     print(f"seeded: {count}")
     print(f"external_id: {SEEDED_EXTERNAL_ID}")

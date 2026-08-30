@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 from lhf.listings.listing import NearestStation
-from lhf.scraper.checkpoint import (
+from lhf.scraper.rightmove.checkpoint import (
     CHECKPOINT_VERSION,
     ActiveShard,
     checkpoint_path,
@@ -12,9 +12,9 @@ from lhf.scraper.checkpoint import (
     new_checkpoint,
     save_checkpoint,
 )
-from lhf.scraper.detail import PropertyDetail
-from lhf.scraper.search import SearchCard
-from lhf.scraper.shards import SEARCH_URL, SearchFilter
+from lhf.scraper.rightmove.detail import PropertyDetail
+from lhf.scraper.rightmove.search import SearchCard
+from lhf.scraper.rightmove.shards import SEARCH_URL, SearchFilter
 
 
 def test_checkpoint_path_appends_suffix(tmp_path: Path) -> None:

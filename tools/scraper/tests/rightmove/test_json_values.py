@@ -1,5 +1,5 @@
 from lhf.listings.listing import NearestStation
-from lhf.scraper.json_values import (
+from lhf.scraper.rightmove.json_values import (
     as_coordinates,
     as_display_texts,
     as_joined_lines,

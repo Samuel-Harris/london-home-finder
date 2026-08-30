@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 from lhf.listings.listing import NearestStation
-from lhf.scraper.search import parse_search_page
+from lhf.scraper.rightmove.search import parse_search_page
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

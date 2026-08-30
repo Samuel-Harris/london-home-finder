@@ -7,9 +7,9 @@ from pathlib import Path
 from types import NoneType, UnionType
 from typing import Any, Literal, TypeAliasType, Union, cast, get_args, get_origin, get_type_hints
 
-from lhf.scraper.detail import PropertyDetail
-from lhf.scraper.search import SearchCard
-from lhf.scraper.shards import SEARCH_URL, SearchFilter
+from lhf.scraper.rightmove.detail import PropertyDetail
+from lhf.scraper.rightmove.search import SearchCard
+from lhf.scraper.rightmove.shards import SEARCH_URL, SearchFilter
 
 CHECKPOINT_VERSION = 2
 type Phase = Literal["search", "details"]

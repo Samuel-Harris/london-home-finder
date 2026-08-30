@@ -4,12 +4,14 @@ from lhf.db.session import create_session_factory
 from lhf.db_app.migrations import upgrade_database
 from lhf.listings.listing import ListingDraft
 from lhf.listings.listing_repository import ListingRepository
-from lhf.scraper.detail import parse_property_data
-from lhf.scraper.map_listing import map_listing
-from lhf.scraper.search import parse_search_page
+from lhf.scraper.rightmove.detail import parse_property_data
+from lhf.scraper.rightmove.map_listing import map_listing
+from lhf.scraper.rightmove.search import parse_search_page
 from sqlalchemy import text
 
-FIXTURES = Path(__file__).resolve().parents[2] / "tools" / "scraper" / "tests" / "fixtures"
+FIXTURES = (
+    Path(__file__).resolve().parents[2] / "tools" / "scraper" / "tests" / "rightmove" / "fixtures"
+)
 
 
 def test_recorded_rightmove_html_round_trips_through_migrated_sqlite(tmp_path: Path) -> None:

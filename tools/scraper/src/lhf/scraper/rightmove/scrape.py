@@ -5,7 +5,7 @@ from pathlib import Path
 
 from lhf.db.session import create_session_factory
 from lhf.listings.listing_repository import ListingRepository
-from lhf.scraper.checkpoint import (
+from lhf.scraper.rightmove.checkpoint import (
     ActiveShard,
     Checkpoint,
     checkpoint_path,
@@ -14,11 +14,11 @@ from lhf.scraper.checkpoint import (
     new_checkpoint,
     save_checkpoint,
 )
-from lhf.scraper.detail import PropertyDetail, parse_property_data
-from lhf.scraper.http import RIGHTMOVE_ORIGIN, Fetcher, FetchError
-from lhf.scraper.map_listing import map_listing
-from lhf.scraper.search import SearchCard, SearchPage, parse_search_page
-from lhf.scraper.shards import SearchFilter, filter_label, search_url, split_filter
+from lhf.scraper.rightmove.detail import PropertyDetail, parse_property_data
+from lhf.scraper.rightmove.http import RIGHTMOVE_ORIGIN, Fetcher, FetchError
+from lhf.scraper.rightmove.map_listing import map_listing
+from lhf.scraper.rightmove.search import SearchCard, SearchPage, parse_search_page
+from lhf.scraper.rightmove.shards import SearchFilter, filter_label, search_url, split_filter
 from lhf.scraper.window import DEFAULT_WINDOW, IngestWindow
 
 MAX_SEARCH_INDEX = 984

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from lhf.scraper.detail import parse_property_data
+from lhf.scraper.rightmove.detail import parse_property_data
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

@@ -4,7 +4,7 @@ import argparse
 from collections.abc import Sequence
 from pathlib import Path
 
-from lhf.scraper.scrape import scrape
+from lhf.scraper.rightmove.scrape import scrape
 from lhf.scraper.window import DEFAULT_WINDOW, IngestWindow
 
 

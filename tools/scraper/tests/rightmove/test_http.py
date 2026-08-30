@@ -1,5 +1,5 @@
 import pytest
-from lhf.scraper.http import Fetcher, FetchError
+from lhf.scraper.rightmove.http import Fetcher, FetchError
 from playwright.sync_api import Error as PlaywrightError
 
 _INTERRUPTED = (
@@ -34,7 +34,7 @@ def _patch_fetcher(
     monkeypatch: pytest.MonkeyPatch, fetcher: Fetcher, page: _FakePage
 ) -> list[float]:
     sleeps: list[float] = []
-    monkeypatch.setattr("lhf.scraper.http.time.sleep", sleeps.append)
+    monkeypatch.setattr("lhf.scraper.rightmove.http.time.sleep", sleeps.append)
     monkeypatch.setattr(fetcher, "_wait", lambda: None)
     monkeypatch.setattr(fetcher, "_ensure_page", lambda: page)
     monkeypatch.setattr(fetcher, "_reset_page", lambda: None)

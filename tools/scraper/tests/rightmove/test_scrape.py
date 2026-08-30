@@ -7,16 +7,16 @@ from lhf.db.session import create_session_factory
 from lhf.db_app.migrations import upgrade_database
 from lhf.listings.listing import ListingDraft
 from lhf.listings.listing_repository import ListingRepository
-from lhf.scraper.checkpoint import (
+from lhf.scraper.rightmove.checkpoint import (
     ActiveShard,
     checkpoint_path,
     load_checkpoint,
     new_checkpoint,
     save_checkpoint,
 )
-from lhf.scraper.http import FetchError
-from lhf.scraper.scrape import scrape
-from lhf.scraper.shards import SearchFilter
+from lhf.scraper.rightmove.http import FetchError
+from lhf.scraper.rightmove.scrape import scrape
+from lhf.scraper.rightmove.shards import SearchFilter
 from lhf.scraper.window import IngestWindow
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -33,7 +33,7 @@ def test_scrape_maps_recorded_pages_and_deduplicates(
 ) -> None:
     database_path = tmp_path / "scrape.sqlite3"
     upgrade_database(database_path)
-    monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", _recorded_get)
+    monkeypatch.setattr("lhf.scraper.rightmove.scrape.Fetcher.get", _recorded_get)
 
     assert scrape(database_path) == 2
     listings = ListingRepository(create_session_factory(database_path)).list_all()
@@ -80,7 +80,7 @@ def test_failed_search_does_not_wipe_existing_rows(
     def fail(_self: object, url: str) -> str:
         raise FetchError(f"timeout fetching {url}")
 
-    monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", fail)
+    monkeypatch.setattr("lhf.scraper.rightmove.scrape.Fetcher.get", fail)
 
     with pytest.raises(FetchError, match="timeout"):
         scrape(database_path)
@@ -107,7 +107,7 @@ def test_unusable_search_html_does_not_wipe_existing_rows(
     def unusable(_self: object, url: str) -> str:
         return UNUSABLE_SEARCH
 
-    monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", unusable)
+    monkeypatch.setattr("lhf.scraper.rightmove.scrape.Fetcher.get", unusable)
 
     with pytest.raises(FetchError, match="missing __NEXT_DATA__"):
         scrape(database_path)
@@ -135,7 +135,7 @@ def test_empty_search_results_do_not_wipe_existing_rows(
     def empty(_self: object, url: str) -> str:
         return EMPTY_SEARCH
 
-    monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", empty)
+    monkeypatch.setattr("lhf.scraper.rightmove.scrape.Fetcher.get", empty)
 
     with pytest.raises(ValueError, match="scrape produced no listings"):
         scrape(database_path)
@@ -158,7 +158,7 @@ def test_detail_failure_keeps_the_search_card(
             return (FIXTURES / "search.html").read_text(encoding="utf-8")
         raise FetchError(f"HTTP 500 fetching {url}")
 
-    monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", fake_get)
+    monkeypatch.setattr("lhf.scraper.rightmove.scrape.Fetcher.get", fake_get)
 
     assert scrape(database_path) == 2
     listings = ListingRepository(create_session_factory(database_path)).list_all()
@@ -210,7 +210,7 @@ def test_scrape_splits_overflow_and_unions_in_band_ids(
             )
         raise FetchError(f"unexpected url {url}")
 
-    monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", fake_get)
+    monkeypatch.setattr("lhf.scraper.rightmove.scrape.Fetcher.get", fake_get)
 
     assert scrape(database_path) == 3
     listings = ListingRepository(create_session_factory(database_path)).list_all()
@@ -248,7 +248,7 @@ def test_atomic_overflow_does_not_wipe_existing_rows(
             raise FetchError(f"unexpected url {url}")
         return _search_html(2000, [_property(1, 500_000)])
 
-    monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", fake_get)
+    monkeypatch.setattr("lhf.scraper.rightmove.scrape.Fetcher.get", fake_get)
 
     with pytest.raises(FetchError, match="unsplittable filter"):
         scrape(database_path, window=IngestWindow(min_price=500_000, max_price=500_000))
@@ -279,7 +279,7 @@ def test_max_pages_stops_after_one_in_cap_search_page(
             return _search_html(2, [_property(444444, 800_000)])
         raise FetchError(f"unexpected url {url}")
 
-    monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", fake_get)
+    monkeypatch.setattr("lhf.scraper.rightmove.scrape.Fetcher.get", fake_get)
 
     assert scrape(database_path, max_pages=1) == 2
     listings = ListingRepository(create_session_factory(database_path)).list_all()
@@ -307,7 +307,7 @@ def test_unlimited_pages_paginates_until_empty(
             return EMPTY_SEARCH
         return (FIXTURES / "search.html").read_text(encoding="utf-8")
 
-    monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", fake_get)
+    monkeypatch.setattr("lhf.scraper.rightmove.scrape.Fetcher.get", fake_get)
 
     assert scrape(database_path) == 3
     listings = ListingRepository(create_session_factory(database_path)).list_all()
@@ -321,7 +321,7 @@ def test_scrape_rejects_invalid_max_pages_before_fetch(
     def fail(_self: object, url: str) -> str:
         raise FetchError(f"should not fetch {url}")
 
-    monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", fail)
+    monkeypatch.setattr("lhf.scraper.rightmove.scrape.Fetcher.get", fail)
 
     with pytest.raises(ValueError, match="max_pages"):
         scrape(tmp_path / "scrape.sqlite3", max_pages=0)
@@ -362,7 +362,7 @@ def test_resume_continues_search_from_failed_index(
             return EMPTY_SEARCH
         return (FIXTURES / "search.html").read_text(encoding="utf-8")
 
-    monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", fake_get)
+    monkeypatch.setattr("lhf.scraper.rightmove.scrape.Fetcher.get", fake_get)
 
     with pytest.raises(FetchError, match="ERR_INTERNET_DISCONNECTED"):
         scrape(database_path)
@@ -411,7 +411,7 @@ def test_resume_skips_saved_detail(tmp_path: Path, monkeypatch: pytest.MonkeyPat
             return (FIXTURES / "detail_freehold.html").read_text(encoding="utf-8")
         raise FetchError(f"unexpected url {url}")
 
-    monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", fake_get)
+    monkeypatch.setattr("lhf.scraper.rightmove.scrape.Fetcher.get", fake_get)
 
     with pytest.raises(RuntimeError, match="killed after first detail"):
         scrape(database_path)
@@ -438,7 +438,7 @@ def test_resume_without_checkpoint_does_not_fetch(
     def fail(_self: object, url: str) -> str:
         raise FetchError(f"should not fetch {url}")
 
-    monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", fail)
+    monkeypatch.setattr("lhf.scraper.rightmove.scrape.Fetcher.get", fail)
 
     with pytest.raises(ValueError, match="no scrape checkpoint"):
         scrape(tmp_path / "scrape.sqlite3", resume=True)
@@ -456,7 +456,7 @@ def test_resume_window_mismatch_does_not_fetch_and_keeps_file(
     def fail(_self: object, url: str) -> str:
         raise FetchError(f"should not fetch {url}")
 
-    monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", fail)
+    monkeypatch.setattr("lhf.scraper.rightmove.scrape.Fetcher.get", fail)
 
     with pytest.raises(
         ValueError,
@@ -489,7 +489,7 @@ def test_fresh_scrape_discards_leftover_checkpoint_and_fetches_root(
         fetched.append(url)
         return _recorded_get(_self, url)
 
-    monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", fake_get)
+    monkeypatch.setattr("lhf.scraper.rightmove.scrape.Fetcher.get", fake_get)
 
     assert scrape(database_path) == 2
     stderr = capsys.readouterr().err

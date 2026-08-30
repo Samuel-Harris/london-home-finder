@@ -5,8 +5,8 @@ import re
 from dataclasses import dataclass
 
 from lhf.listings.listing import NearestStation
-from lhf.scraper.http import RIGHTMOVE_ORIGIN
-from lhf.scraper.json_values import (
+from lhf.scraper.rightmove.http import RIGHTMOVE_ORIGIN
+from lhf.scraper.rightmove.json_values import (
     as_coordinates,
     as_dict,
     as_int,

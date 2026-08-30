@@ -1,9 +1,9 @@
 from pathlib import Path
 
 from lhf.listings.listing import ListingDraft
-from lhf.scraper.detail import PropertyDetail, parse_property_data
-from lhf.scraper.map_listing import SQFT_PER_SQM, map_listing
-from lhf.scraper.search import SearchCard, parse_search_page
+from lhf.scraper.rightmove.detail import PropertyDetail, parse_property_data
+from lhf.scraper.rightmove.map_listing import SQFT_PER_SQM, map_listing
+from lhf.scraper.rightmove.search import SearchCard, parse_search_page
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

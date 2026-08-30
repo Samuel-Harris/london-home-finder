@@ -3,8 +3,8 @@ from __future__ import annotations
 import re
 
 from lhf.listings.listing import ListingDraft, normalise_postcode
-from lhf.scraper.detail import PropertyDetail
-from lhf.scraper.search import SearchCard
+from lhf.scraper.rightmove.detail import PropertyDetail
+from lhf.scraper.rightmove.search import SearchCard
 
 LEASEHOLD_TENURES = frozenset({"LEASEHOLD", "SHARE_OF_FREEHOLD"})
 SQFT_PER_SQM = 10.7639

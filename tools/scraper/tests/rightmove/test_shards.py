@@ -1,5 +1,5 @@
 import pytest
-from lhf.scraper.shards import SEARCH_URL, SearchFilter, search_url, split_filter
+from lhf.scraper.rightmove.shards import SEARCH_URL, SearchFilter, search_url, split_filter
 
 
 def test_split_filter_bisects_price() -> None:

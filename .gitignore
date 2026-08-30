@@ -221,6 +221,7 @@ data/
 *.sqlite3-shm
 *.sqlite3-wal
 *.scrape-checkpoint.json
+*.zoopla-scrape-checkpoint.json
 
 # Generated reports
 coverage/

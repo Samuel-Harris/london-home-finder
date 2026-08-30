@@ -11,7 +11,9 @@
 - `tools/scraper` — manually invoked listing ingest CLI. Product window in
   `lhf.scraper.window`; Rightmove HTML ingest in `lhf.scraper.rightmove`
   (adaptive `find.html` price shards, default £350k–£800k 2+ bed freehold houses,
-  opt-in `--resume` sidecar checkpoint); may import `libs/listings` and `libs/db`.
+  opt-in `--resume` sidecar checkpoint); Zoopla HTML ingest in
+  `lhf.scraper.zoopla` (`listings_zoopla`, `just scrape source=zoopla`, cap 1000 /
+  `pn` 1–40, never `q=` or `/api/*`); may import `libs/listings` and `libs/db`.
 - `contracts` — generated OpenAPI contract. Do not edit it by hand.
 
 ## Commands

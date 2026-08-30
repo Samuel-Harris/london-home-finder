@@ -15,7 +15,9 @@ layers =
 name = Listings private modules are only imported inside the listings package
 type = protected
 protected_modules =
+    lhf.listings._listing_columns
     lhf.listings._listing_row
+    lhf.listings._zoopla_listing_row
 allowed_importers =
     lhf.listings
     lhf.db_app

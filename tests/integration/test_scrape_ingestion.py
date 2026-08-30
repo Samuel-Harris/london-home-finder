@@ -20,7 +20,7 @@ def test_recorded_rightmove_html_round_trips_through_migrated_sqlite(tmp_path: P
     repository = ListingRepository(create_session_factory(database_path))
 
     first = _drafts_from_recorded_html()
-    assert repository.replace_all(first) == 2
+    assert repository.replace_source("rightmove", first) == 2
     listings = repository.list_all()
     assert [(listing.external_id, listing.postcode) for listing in listings] == [
         ("111111", None),
@@ -52,7 +52,7 @@ def test_recorded_rightmove_html_round_trips_through_migrated_sqlite(tmp_path: P
             display_address="A later snapshot",
         )
     ]
-    assert repository.replace_all(replacement) == 1
+    assert repository.replace_source("rightmove", replacement) == 1
     assert [listing.external_id for listing in repository.list_all()] == ["333333"]
 
     sessions = create_session_factory(database_path)

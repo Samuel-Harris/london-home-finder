@@ -23,7 +23,8 @@ def test_listings_endpoint_reads_the_listings_repository(tmp_path: Path) -> None
     database_path = tmp_path / "api.sqlite3"
     upgrade_database(database_path)
     repository = ListingRepository(create_session_factory(database_path))
-    repository.replace_all(
+    repository.replace_source(
+        "rightmove",
         [
             ListingDraft(
                 source="rightmove",
@@ -66,7 +67,7 @@ def test_listings_endpoint_reads_the_listings_repository(tmp_path: Path) -> None
                 listing_update_date="2026-05-12T10:00:00Z",
                 first_visible_date="2026-01-15T12:00:00Z",
             )
-        ]
+        ],
     )
 
     test_client = cast(Client, TestClient(create_app(database_path)))

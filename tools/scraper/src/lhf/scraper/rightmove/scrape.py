@@ -43,7 +43,9 @@ def scrape(
     drafts = [map_listing(card, state.details[card.listing_id]) for card in state.cards]
     if not drafts:
         raise ValueError("scrape produced no listings")
-    count = ListingRepository(create_session_factory(database_path)).replace_all(drafts)
+    count = ListingRepository(create_session_factory(database_path)).replace_source(
+        "rightmove", drafts
+    )
     clear_checkpoint(path)
     return count
 

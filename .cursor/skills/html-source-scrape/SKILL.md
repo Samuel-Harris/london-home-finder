@@ -29,12 +29,12 @@ Copy this checklist and keep it in the conversation:
 - Save **raw HTML**. Accessibility snapshots and markdown captures strip `__NEXT_DATA__` and `window.__*` payloads.
 - Look for JSON in `<script>` tags and `window.*` assignments before CSS or XPath card parsers.
 - Record robots.txt and in-payload terms of use in the recon artefact. Then fetch HTML listing pages unless robots forbids those URLs. Never call vendor `/api/*`. That observation is not a licence.
-- One table per source. `replace_all` for a source must not delete another source's rows. If a run is wrong, scrape again.
+- Persist isolation is per source. `replace_source` must not delete another source's rows. If a run is wrong, scrape again.
 - Identity (`source`, `external_id`, `url`) required. Economics nullable. Keep sparse rows.
 - Tests never use the network and never launch Chromium.
 - One user entrypoint. No second ingest contract.
 
-In this repository, `tools/scraper/AGENTS.md` owns `just scrape`, the default window, Playwright, shards, and `--resume`. Do not copy that contract here. Follow it when the build is in this repo. Do not add a second source onto the shared `listings` table.
+In this repository, `tools/scraper/AGENTS.md` owns `just scrape`, the default window, Playwright, shards, and `--resume`. Do not copy that contract here. Follow it when the build is in this repo. `listings` is the shared snapshot with unique `(source, external_id)`. Isolate with `replace_source`. Do not add a second isomorphic listings table.
 
 ## Phase A. Recon
 
@@ -63,14 +63,14 @@ Do not interview a measured page cap. If `resultCount` exceeds the reachable pag
 1. Pure parse modules. Input is `html: str`. Output is a frozen dataclass (search card, detail record). No vendor dicts past this boundary. Defensive JSON coercion lives in one helper module.
 2. Map owns policy (prefer detail, sentinel zeros → null, unit conversion, invalid postcode → null).
 3. Fetcher isolated. Tests fake `get`. Lazy-start the browser on first real request. Escalate to Playwright only if recon proved it necessary. Retry timeouts and 5xx. Fail immediately on 4xx. After a poisoned navigation (`chrome-error://`), close the tab and open a new one. Check HTTP status; `page.goto` does not throw on 403. Distinguish blocked HTML (zero cards, no embed) from a real empty result set.
-4. Persist once, atomically, to **that source's table**. Fail closed. A failed or empty crawl must not wipe the previous snapshot. Checkpoint job progress in a sidecar JSON beside the DB (`*.tmp` then `os.replace`), not in the listings schema. Dedupe by vendor id. Drop featured leakage whose known price is outside the **window**. Keep POA.
+4. Persist once, atomically, with `replace_source`. Fail closed. A failed or empty crawl must not wipe the previous snapshot. Checkpoint job progress in a sidecar JSON beside the DB (`*.tmp` then `os.replace`), not in the listings schema. Dedupe by vendor id. Drop featured leakage whose known price is outside the **window**. Keep POA.
 5. If the cap is real, adaptive-split the user's filter (price first, then the next discrete filter) until each shard is complete. Union unique ids. Fail if unsplittable.
 6. Wire one user command. Move domain, API, and migrations in the same change when columns change.
 7. Record fixtures from live HTML (script payload only if the page is huge). When a live run shows 0% on a field that recon sampled as present, re-fetch one live page and diff keys against the fixture.
 
 ## Phase D. Prove
 
-Run the scraper with the product's default filters against the working database for that source's table.
+Run the scraper with the product's default filters against the working database. Query that source's rows.
 
 Query the snapshot: unique vendor ids, URL matches id, identity complete, price bounds, coverage vs recon sample. 0% on a field that recon saw is a parser bug. Sparse-but-nonzero is usually the vendor.
 

@@ -51,6 +51,6 @@ curl plus Chrome UA worked for research. Live ingest needed Playwright after Fas
 
 ## Persist in this repo today
 
-Rightmove still writes the shared `listings` table via `ListingRepository.replace_all`, which deletes every row. The skill persist rule is one table per source. Do not add Zoopla (or any second source) onto `listings`. Split first.
+Rightmove and OnTheMarket write the shared `listings` table via `ListingRepository.replace_source`. The delete is scoped to `source`. Unique `(source, external_id)` is the identity. Do not add a second isomorphic listings table.
 
 Default window lives in `lhf.scraper.window.DEFAULT_WINDOW`. Phase D runs `just scrape` with no window-flag overrides (omitted flags take `DEFAULT_WINDOW`).

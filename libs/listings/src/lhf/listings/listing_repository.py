@@ -14,10 +14,15 @@ class ListingRepository:
     def __init__(self, sessions: sessionmaker[Session]) -> None:
         self._sessions = sessions
 
-    def replace_all(self, drafts: Iterable[ListingDraft]) -> int:
+    def replace_source(self, source: str, drafts: Iterable[ListingDraft]) -> int:
+        if not source.strip():
+            raise ValueError("source must not be blank")
         draft_list = list(drafts)
+        mismatched = next((draft for draft in draft_list if draft.source != source), None)
+        if mismatched is not None:
+            raise ValueError(f"draft source {mismatched.source!r} does not match {source!r}")
         with self._sessions.begin() as session:
-            session.execute(delete(ListingRow))
+            session.execute(delete(ListingRow).where(ListingRow.source == source))
             session.add_all([_row_from_draft(draft) for draft in draft_list])
         return len(draft_list)
 

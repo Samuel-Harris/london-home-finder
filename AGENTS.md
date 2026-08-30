@@ -10,8 +10,11 @@
 - `libs/api-client` — generated OpenAPI client plus its small handwritten wrapper.
 - `tools/scraper` — manually invoked listing ingest CLI. Product window in
   `lhf.scraper.window`; Rightmove HTML ingest in `lhf.scraper.rightmove`
-  (adaptive `find.html` price shards, default £350k–£800k 2+ bed freehold houses,
-  opt-in `--resume` sidecar checkpoint); may import `libs/listings` and `libs/db`.
+  (adaptive `find.html` price shards, Playwright, `{database}.scrape-checkpoint.json`);
+  OnTheMarket HTML ingest in `lhf.scraper.onthemarket` (urllib path shards,
+  `{database}.onthemarket-scrape-checkpoint.json`). `just scrape` runs both sources.
+  Each source replaces only its own `listings` rows via `replace_source`.
+  May import `libs/listings` and `libs/db`.
 - `contracts` — generated OpenAPI contract. Do not edit it by hand.
 
 ## Commands

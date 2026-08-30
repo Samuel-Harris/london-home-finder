@@ -212,7 +212,8 @@ def cmd_browser(arguments: argparse.Namespace) -> int:
 def cmd_seed_listing(_arguments: argparse.Namespace) -> int:
     state = _require_instance()
     repository = ListingRepository(create_session_factory(state["database_path"]))
-    count = repository.replace_all(
+    count = repository.replace_source(
+        "verify",
         [
             ListingDraft(
                 source="verify",

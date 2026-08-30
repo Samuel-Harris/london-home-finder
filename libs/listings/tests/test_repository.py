@@ -1,14 +1,16 @@
 from pathlib import Path
 
+import pytest
 from lhf.db.base import metadata
 from lhf.db.session import create_session_factory
 from lhf.listings.listing import ListingDraft, NearestStation
 from lhf.listings.listing_repository import ListingRepository
 
 
-def test_repository_replace_all_replaces_the_whole_table(tmp_path: Path) -> None:
+def test_repository_replace_source_replaces_that_source(tmp_path: Path) -> None:
     repository = _repository(tmp_path)
-    repository.replace_all(
+    repository.replace_source(
+        "example",
         [
             ListingDraft(
                 source="example",
@@ -18,9 +20,10 @@ def test_repository_replace_all_replaces_the_whole_table(tmp_path: Path) -> None
                 postcode="SW1A 1AA",
                 url="https://example.test/home-1",
             )
-        ]
+        ],
     )
-    repository.replace_all(
+    repository.replace_source(
+        "example",
         [
             ListingDraft(
                 source="example",
@@ -30,12 +33,52 @@ def test_repository_replace_all_replaces_the_whole_table(tmp_path: Path) -> None
                 postcode="E8 1EA",
                 url="https://example.test/home-2",
             )
-        ]
+        ],
     )
 
     listings = repository.list_all()
     assert [(listing.external_id, listing.display_address) for listing in listings] == [
         ("home-2", "Replacement address")
+    ]
+
+
+def test_repository_replace_source_leaves_other_sources(tmp_path: Path) -> None:
+    repository = _repository(tmp_path)
+    repository.replace_source(
+        "rightmove",
+        [
+            ListingDraft(
+                source="rightmove",
+                external_id="kept-rightmove",
+                url="https://www.rightmove.co.uk/properties/kept",
+            )
+        ],
+    )
+    repository.replace_source(
+        "onthemarket",
+        [
+            ListingDraft(
+                source="onthemarket",
+                external_id="otm-1",
+                url="https://www.onthemarket.com/details/1/",
+            )
+        ],
+    )
+    repository.replace_source(
+        "onthemarket",
+        [
+            ListingDraft(
+                source="onthemarket",
+                external_id="otm-2",
+                url="https://www.onthemarket.com/details/2/",
+            )
+        ],
+    )
+
+    listings = repository.list_all()
+    assert [(listing.source, listing.external_id) for listing in listings] == [
+        ("rightmove", "kept-rightmove"),
+        ("onthemarket", "otm-2"),
     ]
 
 
@@ -55,7 +98,8 @@ def test_repository_round_trips_screening_fields(tmp_path: Path) -> None:
             unit="miles",
         ),
     )
-    repository.replace_all(
+    repository.replace_source(
+        "rightmove",
         [
             ListingDraft(
                 source="rightmove",
@@ -75,7 +119,7 @@ def test_repository_round_trips_screening_fields(tmp_path: Path) -> None:
                 listing_update_date="2026-05-12T10:00:00Z",
                 first_visible_date="2026-01-15T12:00:00Z",
             )
-        ]
+        ],
     )
 
     listing = repository.list_all()[0]
@@ -94,20 +138,55 @@ def test_repository_round_trips_screening_fields(tmp_path: Path) -> None:
     assert listing.first_visible_date == "2026-01-15T12:00:00Z"
 
 
-def test_repository_empty_replace_all_wipes_the_table(tmp_path: Path) -> None:
+def test_repository_empty_replace_source_wipes_that_source_only(tmp_path: Path) -> None:
     repository = _repository(tmp_path)
-    repository.replace_all(
+    repository.replace_source(
+        "example",
         [
             ListingDraft(
                 source="example",
                 external_id="home-1",
                 url="https://example.test/home-1",
             )
-        ]
+        ],
+    )
+    repository.replace_source(
+        "rightmove",
+        [
+            ListingDraft(
+                source="rightmove",
+                external_id="kept",
+                url="https://www.rightmove.co.uk/properties/kept",
+            )
+        ],
     )
 
-    assert repository.replace_all([]) == 0
-    assert repository.list_all() == []
+    assert repository.replace_source("example", []) == 0
+    listings = repository.list_all()
+    assert [(listing.source, listing.external_id) for listing in listings] == [
+        ("rightmove", "kept")
+    ]
+
+
+def test_repository_replace_source_rejects_blank_source(tmp_path: Path) -> None:
+    repository = _repository(tmp_path)
+    with pytest.raises(ValueError, match="source must not be blank"):
+        repository.replace_source("  ", [])
+
+
+def test_repository_replace_source_rejects_mismatched_draft_source(tmp_path: Path) -> None:
+    repository = _repository(tmp_path)
+    with pytest.raises(ValueError, match="does not match"):
+        repository.replace_source(
+            "onthemarket",
+            [
+                ListingDraft(
+                    source="rightmove",
+                    external_id="home-1",
+                    url="https://www.rightmove.co.uk/properties/1",
+                )
+            ],
+        )
 
 
 def _repository(tmp_path: Path) -> ListingRepository:

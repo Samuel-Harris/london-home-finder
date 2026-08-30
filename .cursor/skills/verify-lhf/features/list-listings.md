@@ -27,7 +27,7 @@ Preconditions:
 
 ## Gotchas
 
-- `seed-listing` uses `replace_all` and wipes every row in the isolated database. Do not seed if you still need the empty-list artefact.
+- `seed-listing` uses `replace_source` and replaces every `verify` row in the isolated database. Do not seed if you still need the empty-list artefact.
 - The running API reads SQLite per request. You do not restart after seed.
 - The home page does not render this payload. Browser screenshots cannot prove this feature.
 - Do not scrape Rightmove to populate listings for verification.

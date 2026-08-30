@@ -1,16 +1,19 @@
 from __future__ import annotations
 
 import argparse
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from pathlib import Path
 
-from lhf.scraper.rightmove.scrape import scrape
+from lhf.scraper.onthemarket.checkpoint import checkpoint_path as onthemarket_checkpoint_path
+from lhf.scraper.onthemarket.scrape import scrape as scrape_onthemarket
+from lhf.scraper.rightmove.checkpoint import checkpoint_path as rightmove_checkpoint_path
+from lhf.scraper.rightmove.scrape import scrape as scrape_rightmove
 from lhf.scraper.window import DEFAULT_WINDOW, IngestWindow
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Scrape Rightmove London BUY listings into SQLite."
+        description="Scrape Rightmove and OnTheMarket London BUY listings into SQLite."
     )
     parser.add_argument("--database", type=Path, required=True)
     parser.add_argument("--min-price", type=int, default=DEFAULT_WINDOW.min_price)
@@ -30,22 +33,47 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--resume", action="store_true")
     arguments = parser.parse_args(argv)
     try:
-        count = scrape(
-            arguments.database,
-            window=IngestWindow(
-                min_price=arguments.min_price,
-                max_price=arguments.max_price,
-                min_bedrooms=_min_bedrooms(arguments.min_bedrooms),
-                property_types=_property_types(arguments.property_types),
-                tenure=_tenure(arguments.tenure),
-            ),
-            max_pages=arguments.max_pages,
-            resume=arguments.resume,
+        window = IngestWindow(
+            min_price=arguments.min_price,
+            max_price=arguments.max_price,
+            min_bedrooms=_min_bedrooms(arguments.min_bedrooms),
+            property_types=_property_types(arguments.property_types),
+            tenure=_tenure(arguments.tenure),
         )
+        for name, scrape, resume_source in _source_runs(arguments.database, arguments.resume):
+            count = scrape(
+                arguments.database,
+                window=window,
+                max_pages=arguments.max_pages,
+                resume=resume_source,
+            )
+            print(f"Replaced {name} listings with {count} rows in {arguments.database}.")
     except ValueError as exc:
         parser.error(str(exc))
-    print(f"Replaced listings with {count} rows in {arguments.database}.")
     return 0
+
+
+def _source_runs(database: Path, resume: bool) -> list[tuple[str, Callable[..., int], bool]]:
+    sources: tuple[tuple[str, Callable[..., int], Callable[[Path], Path]], ...] = (
+        ("rightmove", scrape_rightmove, rightmove_checkpoint_path),
+        ("onthemarket", scrape_onthemarket, onthemarket_checkpoint_path),
+    )
+    if not resume:
+        return [(name, scrape, False) for name, scrape, _checkpoint in sources]
+    present = tuple(
+        checkpoint_for(database).is_file() for _name, _scrape, checkpoint_for in sources
+    )
+    if not any(present):
+        raise ValueError(f"no scrape checkpoint to resume at {database}")
+    runs: list[tuple[str, Callable[..., int], bool]] = []
+    earlier_in_progress = False
+    for (name, scrape, _checkpoint), has_checkpoint in zip(sources, present, strict=True):
+        if has_checkpoint:
+            runs.append((name, scrape, True))
+            earlier_in_progress = True
+        elif earlier_in_progress:
+            runs.append((name, scrape, False))
+    return runs
 
 
 def _min_bedrooms(value: int) -> int | None:

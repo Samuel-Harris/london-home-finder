@@ -67,7 +67,8 @@ def test_failed_search_does_not_wipe_existing_rows(
     database_path = tmp_path / "scrape.sqlite3"
     upgrade_database(database_path)
     repository = ListingRepository(create_session_factory(database_path))
-    repository.replace_all(
+    repository.replace_source(
+        "rightmove",
         [
             ListingDraft(
                 source="rightmove",
@@ -94,7 +95,8 @@ def test_unusable_search_html_does_not_wipe_existing_rows(
     database_path = tmp_path / "scrape.sqlite3"
     upgrade_database(database_path)
     repository = ListingRepository(create_session_factory(database_path))
-    repository.replace_all(
+    repository.replace_source(
+        "rightmove",
         [
             ListingDraft(
                 source="rightmove",
@@ -122,7 +124,8 @@ def test_empty_search_results_do_not_wipe_existing_rows(
     database_path = tmp_path / "scrape.sqlite3"
     upgrade_database(database_path)
     repository = ListingRepository(create_session_factory(database_path))
-    repository.replace_all(
+    repository.replace_source(
+        "rightmove",
         [
             ListingDraft(
                 source="rightmove",
@@ -233,7 +236,8 @@ def test_atomic_overflow_does_not_wipe_existing_rows(
     database_path = tmp_path / "scrape.sqlite3"
     upgrade_database(database_path)
     repository = ListingRepository(create_session_factory(database_path))
-    repository.replace_all(
+    repository.replace_source(
+        "rightmove",
         [
             ListingDraft(
                 source="rightmove",
@@ -335,7 +339,8 @@ def test_resume_continues_search_from_failed_index(
     database_path = tmp_path / "scrape.sqlite3"
     upgrade_database(database_path)
     repository = ListingRepository(create_session_factory(database_path))
-    repository.replace_all(
+    repository.replace_source(
+        "rightmove",
         [
             ListingDraft(
                 source="rightmove",

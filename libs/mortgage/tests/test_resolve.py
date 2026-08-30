@@ -16,9 +16,9 @@ from lhf.mortgage.evaluate import evaluate_at_price
 from lhf.mortgage.snapshot import AUGUST_2026
 
 
-def test_monthly_cap_reverses_to_about_four_hundred_ten_thousand(golden_buyer: Buyer) -> None:
+def test_monthly_cap_reverses_near_four_hundred_ten_thousand(sample_buyer: Buyer) -> None:
     answer = resolve(
-        PriceUnknownCappedByMonthly(buyer=golden_buyer, monthly=2_200),
+        PriceUnknownCappedByMonthly(buyer=sample_buyer, monthly=2_200),
         AUGUST_2026,
     )
 
@@ -30,21 +30,21 @@ def test_monthly_cap_reverses_to_about_four_hundred_ten_thousand(golden_buyer: B
     assert answer.caveat == AUGUST_2026.caveat
 
 
-def test_price_unknown_densifies_to_true_max(golden_buyer: Buyer) -> None:
+def test_price_unknown_densifies_to_true_max(sample_buyer: Buyer) -> None:
     answer = resolve(
-        PriceUnknown(buyer=golden_buyer, min_price=550_000, max_price=580_000, step=10_000),
+        PriceUnknown(buyer=sample_buyer, min_price=430_000, max_price=460_000, step=10_000),
         AUGUST_2026,
     )
 
     assert isinstance(answer, PriceTableAnswer)
-    assert answer.max_viable.price == 565_000
+    assert answer.max_viable.price == 445_238
     assert answer.max_viable in answer.rows
-    assert evaluate_at_price(AUGUST_2026, golden_buyer, 565_001).constraints.viable is False
+    assert evaluate_at_price(AUGUST_2026, sample_buyer, 445_239).constraints.viable is False
 
 
-def test_price_unknown_returns_last_viable_row(golden_buyer: Buyer) -> None:
+def test_price_unknown_returns_last_viable_row(sample_buyer: Buyer) -> None:
     answer = resolve(
-        PriceUnknown(buyer=golden_buyer, min_price=400_000, max_price=500_000, step=10_000),
+        PriceUnknown(buyer=sample_buyer, min_price=350_000, max_price=420_000, step=10_000),
         AUGUST_2026,
     )
 
@@ -53,9 +53,9 @@ def test_price_unknown_returns_last_viable_row(golden_buyer: Buyer) -> None:
     assert answer.max_viable == viable[-1]
 
 
-def test_empty_window_is_unsatisfiable(golden_buyer: Buyer) -> None:
+def test_empty_window_is_unsatisfiable(sample_buyer: Buyer) -> None:
     answer = resolve(
-        PriceUnknown(buyer=golden_buyer, min_price=2_000_000, max_price=2_100_000, step=10_000),
+        PriceUnknown(buyer=sample_buyer, min_price=2_000_000, max_price=2_100_000, step=10_000),
         AUGUST_2026,
     )
 
@@ -64,31 +64,31 @@ def test_empty_window_is_unsatisfiable(golden_buyer: Buyer) -> None:
     assert answer.caveat == AUGUST_2026.caveat
 
 
-def test_deposit_needed_at_four_hundred_ten_thousand() -> None:
+def test_deposit_needed_at_three_hundred_fifty_thousand() -> None:
     answer = resolve(
         DepositAtPrice(
-            earnings=Earnings(base_salary=115_000, bonus=10_000, bonus_counted_percent=50),
-            price=410_000,
+            earnings=Earnings(base_salary=90_000, bonus=0, bonus_counted_percent=50),
+            price=350_000,
         ),
         AUGUST_2026,
     )
 
     assert isinstance(answer, DepositAnswer)
-    assert answer.stamp_duty == 5_500
+    assert answer.stamp_duty == 2_500
     assert answer.fees == 2_500
-    assert answer.loan == 389_500
-    assert answer.cash_needed == 28_500
+    assert answer.loan == 332_500
+    assert answer.cash_needed == 22_500
 
 
-def test_income_needed_at_four_hundred_ten_thousand() -> None:
+def test_income_needed_at_three_hundred_fifty_thousand() -> None:
     answer = resolve(
         IncomeAtPrice(
-            funds=Funds(cash=37_000, lisa=16_000),
-            price=410_000,
+            funds=Funds(cash=40_000, lisa=10_000),
+            price=350_000,
         ),
         AUGUST_2026,
     )
 
     assert isinstance(answer, IncomeAnswer)
-    assert answer.loan == 365_000
-    assert answer.assessed_income_needed == 81_112
+    assert answer.loan == 305_000
+    assert answer.assessed_income_needed == 67_778

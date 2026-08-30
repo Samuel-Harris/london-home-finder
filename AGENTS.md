@@ -11,7 +11,8 @@
   enquiry). Pure; no db, listings, rich, or argparse.
 - `libs/api-client` — generated OpenAPI client plus its small handwritten wrapper.
 - `tools/mortgage` — operator CLI `lhf-mortgage` (`just mortgage`). Imports
-  `lhf.mortgage`. Subcommands `price`, `monthly`, `deposit`, `income`.
+  `lhf.mortgage`. Subcommands `price`, `monthly`, `deposit`, `income`. Confirm
+  missing enquiry inputs with the user before running; see `tools/mortgage/AGENTS.md`.
 - `tools/scraper` — manually invoked listing ingest CLI. Product window in
   `lhf.scraper.window`; Rightmove HTML ingest in `lhf.scraper.rightmove`
   (adaptive `find.html` price shards, Playwright, `{database}.scrape-checkpoint.json`);

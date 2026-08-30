@@ -5,9 +5,9 @@ from lhf.mortgage.buyer import Buyer, Earnings, Funds
 
 
 @pytest.fixture
-def golden_buyer() -> Buyer:
+def sample_buyer() -> Buyer:
     return Buyer(
-        earnings=Earnings(base_salary=115_000, bonus=10_000, bonus_counted_percent=50),
-        funds=Funds(cash=37_000, lisa=16_000),
+        earnings=Earnings(base_salary=90_000, bonus=0, bonus_counted_percent=50),
+        funds=Funds(cash=40_000, lisa=10_000),
         term_years=25,
     )

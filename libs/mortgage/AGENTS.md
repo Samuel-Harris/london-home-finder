@@ -8,4 +8,5 @@ package-private.
 Commands: `uv run pytest libs/mortgage/tests` and `uv run pyright libs/mortgage`.
 Conventions: money is integer pounds; rates are `Decimal` fractions; frozen dataclasses;
 `evaluate_at_price` is the canonical operation; `scan` only maps that over a grid.
+Test fixtures use a fictional sample buyer, never a real operator's figures.
 Never: rich, argparse, live rate fetches, or re-export barrels.

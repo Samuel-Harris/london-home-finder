@@ -9,7 +9,7 @@ def _plain(output: str) -> str:
 
 
 def test_price_prints_a_table(capsys: pytest.CaptureFixture[str]) -> None:
-    assert main(["price", "--base-salary", "115000", "--cash", "37000", "--lisa", "16000"]) == 0
+    assert main(["price", "--base-salary", "90000", "--cash", "40000", "--lisa", "10000"]) == 0
     output = _plain(capsys.readouterr().out)
     assert "Price" in output
     assert "Monthly" in output
@@ -28,11 +28,11 @@ def test_deposit_rejects_cash_flag() -> None:
             [
                 "deposit",
                 "--base-salary",
-                "115000",
+                "90000",
                 "--price",
                 "410000",
                 "--cash",
-                "37000",
+                "40000",
             ]
         )
 
@@ -43,7 +43,7 @@ def test_deposit_rejects_term_flag() -> None:
             [
                 "deposit",
                 "--base-salary",
-                "115000",
+                "90000",
                 "--price",
                 "410000",
                 "--term",
@@ -58,9 +58,9 @@ def test_non_positive_term_fails() -> None:
             [
                 "monthly",
                 "--base-salary",
-                "115000",
+                "90000",
                 "--cash",
-                "37000",
+                "40000",
                 "--price",
                 "410000",
                 "--term",
@@ -77,11 +77,11 @@ def test_monthly_cap_marks_later_rows_over_monthly(
             [
                 "price",
                 "--base-salary",
-                "115000",
+                "90000",
                 "--cash",
-                "37000",
+                "40000",
                 "--lisa",
-                "16000",
+                "10000",
                 "--monthly",
                 "2200",
                 "--min-price",
@@ -105,9 +105,9 @@ def test_invalid_income_multiple_is_usage_error(capsys: pytest.CaptureFixture[st
             [
                 "price",
                 "--base-salary",
-                "115000",
+                "90000",
                 "--cash",
-                "37000",
+                "40000",
                 "--income-multiple",
                 "foo",
             ]
@@ -122,7 +122,7 @@ def test_unsatisfiable_prints_reason_and_caveat(capsys: pytest.CaptureFixture[st
             [
                 "price",
                 "--base-salary",
-                "115000",
+                "90000",
                 "--cash",
                 "1000",
                 "--min-price",

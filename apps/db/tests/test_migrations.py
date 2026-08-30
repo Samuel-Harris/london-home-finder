@@ -41,3 +41,6 @@ def test_upgrade_database_creates_listings_table(tmp_path: Path) -> None:
     inspector = inspect(create_engine(f"sqlite+pysqlite:///{database_path.as_posix()}"))
     assert inspector.has_table("listings")
     assert {column["name"] for column in inspector.get_columns("listings")} == LISTING_COLUMNS
+    assert inspector.has_table("listings_zoopla")
+    zoopla_columns = {column["name"] for column in inspector.get_columns("listings_zoopla")}
+    assert zoopla_columns == LISTING_COLUMNS

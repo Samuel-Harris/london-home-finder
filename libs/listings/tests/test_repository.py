@@ -94,6 +94,78 @@ def test_repository_round_trips_screening_fields(tmp_path: Path) -> None:
     assert listing.first_visible_date == "2026-01-15T12:00:00Z"
 
 
+def test_repository_replace_zoopla_does_not_delete_listings_rows(tmp_path: Path) -> None:
+    repository = _repository(tmp_path)
+    repository.replace_all(
+        [
+            ListingDraft(
+                source="rightmove",
+                external_id="kept",
+                url="https://www.rightmove.co.uk/properties/kept",
+            )
+        ]
+    )
+    repository.replace_zoopla(
+        [
+            ListingDraft(
+                source="zoopla",
+                external_id="zoopla-1",
+                url="https://www.zoopla.co.uk/for-sale/details/1/",
+            )
+        ]
+    )
+
+    listings = repository.list_all()
+    assert [(listing.source, listing.external_id) for listing in listings] == [
+        ("rightmove", "kept"),
+        ("zoopla", "zoopla-1"),
+    ]
+
+    repository.replace_zoopla(
+        [
+            ListingDraft(
+                source="zoopla",
+                external_id="zoopla-2",
+                url="https://www.zoopla.co.uk/for-sale/details/2/",
+            )
+        ]
+    )
+    listings = repository.list_all()
+    assert [(listing.source, listing.external_id) for listing in listings] == [
+        ("rightmove", "kept"),
+        ("zoopla", "zoopla-2"),
+    ]
+
+
+def test_repository_replace_all_does_not_delete_zoopla_rows(tmp_path: Path) -> None:
+    repository = _repository(tmp_path)
+    repository.replace_zoopla(
+        [
+            ListingDraft(
+                source="zoopla",
+                external_id="kept-z",
+                url="https://www.zoopla.co.uk/for-sale/details/kept/",
+            )
+        ]
+    )
+    repository.replace_all(
+        [
+            ListingDraft(
+                source="rightmove",
+                external_id="rm-1",
+                url="https://www.rightmove.co.uk/properties/1",
+            )
+        ]
+    )
+
+    listings = repository.list_all()
+    assert [(listing.source, listing.external_id) for listing in listings] == [
+        ("rightmove", "rm-1"),
+        ("zoopla", "kept-z"),
+    ]
+    assert listings[0].id == listings[1].id
+
+
 def test_repository_empty_replace_all_wipes_the_table(tmp_path: Path) -> None:
     repository = _repository(tmp_path)
     repository.replace_all(

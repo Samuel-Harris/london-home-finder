@@ -1,7 +1,7 @@
 [project]
 name = "lhf-scraper"
 version = "0.1.0"
-description = "Manual Rightmove ingestion CLI for London Home Finder"
+description = "Manual listing ingestion CLI for London Home Finder"
 requires-python = ">=3.13"
 dependencies = [
     "lhf-db",

@@ -5,6 +5,6 @@ from lhf.listings._listing_columns import ListingColumns
 from sqlalchemy import UniqueConstraint
 
 
-class ListingRow(ListingColumns, Base):
-    __tablename__ = "listings"
+class ZooplaListingRow(ListingColumns, Base):
+    __tablename__ = "listings_zoopla"
     __table_args__ = (UniqueConstraint("source", "external_id"),)

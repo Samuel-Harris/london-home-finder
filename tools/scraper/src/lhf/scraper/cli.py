@@ -3,16 +3,23 @@ from __future__ import annotations
 import argparse
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Literal, assert_never
 
-from lhf.scraper.rightmove.scrape import scrape
+from lhf.scraper.rightmove.scrape import scrape as scrape_rightmove
 from lhf.scraper.window import DEFAULT_WINDOW, IngestWindow
+from lhf.scraper.zoopla.scrape import scrape as scrape_zoopla
+
+type SourceName = Literal["rightmove", "zoopla"]
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(
-        description="Scrape Rightmove London BUY listings into SQLite."
-    )
+    parser = argparse.ArgumentParser(description="Scrape London BUY listings into SQLite.")
     parser.add_argument("--database", type=Path, required=True)
+    parser.add_argument(
+        "--source",
+        choices=("rightmove", "zoopla"),
+        default="rightmove",
+    )
     parser.add_argument("--min-price", type=int, default=DEFAULT_WINDOW.min_price)
     parser.add_argument("--max-price", type=int, default=DEFAULT_WINDOW.max_price)
     parser.add_argument("--min-bedrooms", type=int, default=DEFAULT_WINDOW.min_bedrooms or 0)
@@ -30,15 +37,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--resume", action="store_true")
     arguments = parser.parse_args(argv)
     try:
+        window = IngestWindow(
+            min_price=arguments.min_price,
+            max_price=arguments.max_price,
+            min_bedrooms=_min_bedrooms(arguments.min_bedrooms),
+            property_types=_property_types(arguments.property_types),
+            tenure=_tenure(arguments.tenure),
+        )
+        scrape = _scrape_for(arguments.source)
         count = scrape(
             arguments.database,
-            window=IngestWindow(
-                min_price=arguments.min_price,
-                max_price=arguments.max_price,
-                min_bedrooms=_min_bedrooms(arguments.min_bedrooms),
-                property_types=_property_types(arguments.property_types),
-                tenure=_tenure(arguments.tenure),
-            ),
+            window=window,
             max_pages=arguments.max_pages,
             resume=arguments.resume,
         )
@@ -46,6 +55,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error(str(exc))
     print(f"Replaced listings with {count} rows in {arguments.database}.")
     return 0
+
+
+def _scrape_for(source: SourceName):
+    match source:
+        case "zoopla":
+            return scrape_zoopla
+        case "rightmove":
+            return scrape_rightmove
+        case _:
+            assert_never(source)
 
 
 def _min_bedrooms(value: int) -> int | None:

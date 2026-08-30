@@ -19,12 +19,8 @@ from lhf.scraper.http import RIGHTMOVE_ORIGIN, Fetcher, FetchError
 from lhf.scraper.map_listing import map_listing
 from lhf.scraper.search import SearchCard, SearchPage, parse_search_page
 from lhf.scraper.shards import SearchFilter, filter_label, search_url, split_filter
+from lhf.scraper.window import DEFAULT_WINDOW, IngestWindow
 
-DEFAULT_MIN_PRICE = 350_000
-DEFAULT_MAX_PRICE = 800_000
-DEFAULT_MIN_BEDROOMS = 2
-DEFAULT_PROPERTY_TYPES = ("detached", "semi-detached", "terraced", "bungalow")
-DEFAULT_TENURE = "FREEHOLD"
 MAX_SEARCH_INDEX = 984
 SEARCH_PAGE_SIZE = 24
 PAGE_RESULT_CAP = 1008
@@ -32,24 +28,15 @@ PAGE_RESULT_CAP = 1008
 
 def scrape(
     database_path: str | Path,
-    min_price: int = DEFAULT_MIN_PRICE,
-    max_price: int = DEFAULT_MAX_PRICE,
+    *,
+    window: IngestWindow = DEFAULT_WINDOW,
     max_pages: int | None = None,
-    min_bedrooms: int | None = DEFAULT_MIN_BEDROOMS,
-    property_types: tuple[str, ...] | None = DEFAULT_PROPERTY_TYPES,
-    tenure: str | None = DEFAULT_TENURE,
     resume: bool = False,
 ) -> int:
-    _validate_args(min_price, max_price, max_pages, min_bedrooms)
-    window = SearchFilter(
-        min_price=min_price,
-        max_price=max_price,
-        min_bedrooms=min_bedrooms,
-        property_types=property_types,
-        tenure=tenure,
-    )
+    _validate_max_pages(max_pages)
+    search_filter = _search_filter(window)
     path = checkpoint_path(database_path)
-    state = _load_or_start(path, window, max_pages, resume)
+    state = _load_or_start(path, search_filter, max_pages, resume)
     with Fetcher() as fetcher:
         _walk_search(fetcher, state, path)
         _walk_details(fetcher, state, path)
@@ -61,43 +48,42 @@ def scrape(
     return count
 
 
-def _validate_args(
-    min_price: int,
-    max_price: int,
-    max_pages: int | None,
-    min_bedrooms: int | None,
-) -> None:
-    if min_price <= 0:
-        raise ValueError("min_price must be positive")
-    if max_price < min_price:
-        raise ValueError("max_price must not be less than min_price")
+def _search_filter(window: IngestWindow) -> SearchFilter:
+    return SearchFilter(
+        min_price=window.min_price,
+        max_price=window.max_price,
+        min_bedrooms=window.min_bedrooms,
+        property_types=window.property_types,
+        tenure=window.tenure,
+    )
+
+
+def _validate_max_pages(max_pages: int | None) -> None:
     if max_pages is not None and max_pages <= 0:
         raise ValueError("max_pages must be positive")
-    if min_bedrooms is not None and min_bedrooms < 0:
-        raise ValueError("min_bedrooms must not be negative")
 
 
 def _load_or_start(
     path: Path,
-    window: SearchFilter,
+    search_filter: SearchFilter,
     max_pages: int | None,
     resume: bool,
 ) -> Checkpoint:
     if resume:
         state = load_checkpoint(path)
-        if state.window != window or state.max_pages != max_pages:
+        if state.window != search_filter or state.max_pages != max_pages:
             raise ValueError(
                 "scrape checkpoint does not match "
-                f"min_price={window.min_price} max_price={window.max_price} "
-                f"max_pages={max_pages!r} min_bedrooms={window.min_bedrooms!r} "
-                f"property_types={window.property_types!r} tenure={window.tenure!r}"
+                f"min_price={search_filter.min_price} max_price={search_filter.max_price} "
+                f"max_pages={max_pages!r} min_bedrooms={search_filter.min_bedrooms!r} "
+                f"property_types={search_filter.property_types!r} tenure={search_filter.tenure!r}"
             )
         print(_resume_banner(state), file=sys.stderr)
         return state
     if path.exists():
         print(f"warning: discarding incomplete scrape checkpoint at {path}", file=sys.stderr)
     clear_checkpoint(path)
-    state = new_checkpoint(window, max_pages)
+    state = new_checkpoint(search_filter, max_pages)
     save_checkpoint(path, state)
     return state
 
@@ -167,10 +153,10 @@ def _walk_details(fetcher: Fetcher, state: Checkpoint, path: Path) -> None:
 
 
 def _append_unique_in_band(
-    cards: list[SearchCard], incoming: list[SearchCard], window: SearchFilter
+    cards: list[SearchCard], incoming: list[SearchCard], search_filter: SearchFilter
 ) -> None:
     seen = {card.listing_id for card in cards}
-    for card in _in_band(incoming, window):
+    for card in _in_band(incoming, search_filter):
         if card.listing_id in seen:
             continue
         seen.add(card.listing_id)
@@ -191,12 +177,12 @@ def _search_page(fetcher: Fetcher, search_filter: SearchFilter, index: int) -> S
         raise FetchError(str(exc)) from exc
 
 
-def _in_band(cards: list[SearchCard], window: SearchFilter) -> list[SearchCard]:
+def _in_band(cards: list[SearchCard], search_filter: SearchFilter) -> list[SearchCard]:
     return [
         card
         for card in cards
         if card.asking_price_gbp is None
-        or window.min_price <= card.asking_price_gbp <= window.max_price
+        or search_filter.min_price <= card.asking_price_gbp <= search_filter.max_price
     ]
 
 

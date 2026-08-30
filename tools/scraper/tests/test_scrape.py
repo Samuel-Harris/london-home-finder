@@ -17,6 +17,7 @@ from lhf.scraper.checkpoint import (
 from lhf.scraper.http import FetchError
 from lhf.scraper.scrape import scrape
 from lhf.scraper.shards import SearchFilter
+from lhf.scraper.window import IngestWindow
 
 FIXTURES = Path(__file__).parent / "fixtures"
 EMPTY_SEARCH = (
@@ -250,7 +251,7 @@ def test_atomic_overflow_does_not_wipe_existing_rows(
     monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", fake_get)
 
     with pytest.raises(FetchError, match="unsplittable filter"):
-        scrape(database_path, min_price=500_000, max_price=500_000)
+        scrape(database_path, window=IngestWindow(min_price=500_000, max_price=500_000))
 
     assert [listing.external_id for listing in repository.list_all()] == ["kept"]
 
@@ -314,7 +315,7 @@ def test_unlimited_pages_paginates_until_empty(
     assert any(_query(url).get("index") == "24" for url in fetched if "find.html" in url)
 
 
-def test_scrape_rejects_invalid_window_before_fetch(
+def test_scrape_rejects_invalid_max_pages_before_fetch(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     def fail(_self: object, url: str) -> str:
@@ -322,10 +323,6 @@ def test_scrape_rejects_invalid_window_before_fetch(
 
     monkeypatch.setattr("lhf.scraper.scrape.Fetcher.get", fail)
 
-    with pytest.raises(ValueError, match="min_price"):
-        scrape(tmp_path / "scrape.sqlite3", min_price=0)
-    with pytest.raises(ValueError, match="max_price"):
-        scrape(tmp_path / "scrape.sqlite3", min_price=500_000, max_price=400_000)
     with pytest.raises(ValueError, match="max_pages"):
         scrape(tmp_path / "scrape.sqlite3", max_pages=0)
 

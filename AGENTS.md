@@ -7,7 +7,11 @@
 - `apps/web` — deployable Next.js frontend; may import `libs/api-client` only.
 - `libs/db` — shared SQLAlchemy Base, metadata, and SQLite session factory.
 - `libs/listings` — listing domain, ORM models, and repository; imports `libs/db`.
+- `libs/mortgage` — first-time-buyer mortgage viability domain (snapshot, evaluate,
+  enquiry). Pure; no db, listings, rich, or argparse.
 - `libs/api-client` — generated OpenAPI client plus its small handwritten wrapper.
+- `tools/mortgage` — operator CLI `lhf-mortgage` (`just mortgage`). Imports
+  `lhf.mortgage`. Subcommands `price`, `monthly`, `deposit`, `income`.
 - `tools/scraper` — manually invoked listing ingest CLI. Product window in
   `lhf.scraper.window`; Rightmove HTML ingest in `lhf.scraper.rightmove`
   (adaptive `find.html` price shards, Playwright, `{database}.scrape-checkpoint.json`);

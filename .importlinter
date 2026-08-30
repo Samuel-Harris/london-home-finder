@@ -7,8 +7,8 @@ include_external_packages = True
 name = Apps and tools are independent above feature libraries above shared libs
 type = layers
 layers =
-    lhf.api | lhf.scraper | lhf.db_app
-    lhf.listings
+    lhf.api | lhf.scraper | lhf.db_app | lhf.mortgage_cli
+    lhf.listings | lhf.mortgage
     lhf.db
 
 [importlinter:contract:listings-public-interface]
@@ -19,3 +19,11 @@ protected_modules =
 allowed_importers =
     lhf.listings
     lhf.db_app
+
+[importlinter:contract:mortgage-public-interface]
+name = Mortgage private modules are only imported inside the mortgage package
+type = protected
+protected_modules =
+    lhf.mortgage._schedule
+allowed_importers =
+    lhf.mortgage
